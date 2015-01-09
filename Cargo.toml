@@ -1,5 +1,5 @@
 [package]
 
-name = "case"
+name = "caseless"
 version = "0.0.1"
 authors = ["Sean McArthur <sean.monstar@gmail.com>"]
