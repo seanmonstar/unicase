@@ -8,10 +8,10 @@
 //! ## Example
 //!
 //! ```rust
-//! use caseless::Caseless;
+//! use unicase::UniCase;
 //!
-//! let a = Caseless("foobar");
-//! let b = Caseless("FoObAr");
+//! let a = UniCase("foobar");
+//! let b = UniCase("FoObAr");
 //!
 //! assert_eq!(a, b);
 //! ```
@@ -23,9 +23,9 @@ use std::ops::{Deref, DerefMut};
 
 /// Case Insensitive wrapper of strings.
 #[derive(Clone, Show)]
-pub struct Caseless<S>(pub S);
+pub struct UniCase<S>(pub S);
 
-impl<S> Deref for Caseless<S> {
+impl<S> Deref for UniCase<S> {
     type Target = S;
     #[inline]
     fn deref<'a>(&'a self) -> &'a S {
@@ -33,7 +33,7 @@ impl<S> Deref for Caseless<S> {
     }
 }
 
-impl<S> DerefMut for Caseless<S> {
+impl<S> DerefMut for UniCase<S> {
     #[inline]
     fn deref_mut<'a>(&'a mut self) -> &'a mut S {
         &mut self.0
@@ -41,7 +41,7 @@ impl<S> DerefMut for Caseless<S> {
 }
 
 #[allow(unstable)]
-impl<S: Deref<Target=str>> Str for Caseless<S> {
+impl<S: Deref<Target=str>> Str for UniCase<S> {
     #[inline]
     fn as_slice(&self) -> &str {
         self.0.as_slice()
@@ -50,23 +50,23 @@ impl<S: Deref<Target=str>> Str for Caseless<S> {
 }
 
 #[allow(unstable)]
-impl<S: fmt::String> fmt::String for Caseless<S> {
+impl<S: fmt::String> fmt::String for UniCase<S> {
     #[inline]
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         fmt::String::fmt(&self.0, fmt)
     }
 }
 
-impl<S: Deref<Target=str>> PartialEq for Caseless<S> {
+impl<S: Deref<Target=str>> PartialEq for UniCase<S> {
     #[inline]
     #[allow(unstable)]
-    fn eq(&self, other: &Caseless<S>) -> bool {
+    fn eq(&self, other: &UniCase<S>) -> bool {
         self.eq_ignore_ascii_case(&***other)
     }
 }
 
 
-impl<S: Deref<Target=str>> PartialEq<S> for Caseless<S> {
+impl<S: Deref<Target=str>> PartialEq<S> for UniCase<S> {
     #[inline]
     #[allow(unstable)]
     fn eq(&self, other: &S) -> bool {
@@ -74,10 +74,10 @@ impl<S: Deref<Target=str>> PartialEq<S> for Caseless<S> {
     }
 }
 
-impl<S: Deref<Target=str>> Eq for Caseless<S> {}
+impl<S: Deref<Target=str>> Eq for UniCase<S> {}
 
 #[allow(unstable)]
-impl<H: hash::Writer + hash::Hasher, S: Deref<Target=str>> hash::Hash<H> for Caseless<S> {
+impl<H: hash::Writer + hash::Hasher, S: Deref<Target=str>> hash::Hash<H> for UniCase<S> {
     #[inline]
     fn hash(&self, hasher: &mut H) {
         for byte in self.as_slice().bytes().map(|b| b.to_ascii_lowercase()) {
@@ -91,8 +91,8 @@ impl<H: hash::Writer + hash::Hasher, S: Deref<Target=str>> hash::Hash<H> for Cas
 fn test_case_insensitive() {
     use std::hash::{hash, SipHasher};
 
-    let a = Caseless("foobar");
-    let b = Caseless("FOOBAR");
+    let a = UniCase("foobar");
+    let b = UniCase("FOOBAR");
 
     assert_eq!(a, b);
     assert_eq!(hash::<_, SipHasher>(&a), hash::<_, SipHasher>(&b));
