@@ -3,3 +3,5 @@
 name = "caseless"
 version = "0.0.1"
 authors = ["Sean McArthur <sean.monstar@gmail.com>"]
+description = "A case-insensitive wrapper around strings."
+license = "MIT"
