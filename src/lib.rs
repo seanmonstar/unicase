@@ -20,6 +20,7 @@ use std::ascii::AsciiExt;
 use std::fmt;
 use std::hash;
 use std::ops::{Deref, DerefMut};
+use std::str::FromStr;
 
 /// Case Insensitive wrapper of strings.
 #[derive(Clone, Show)]
@@ -75,6 +76,13 @@ impl<S: Deref<Target=str>> PartialEq<S> for UniCase<S> {
 }
 
 impl<S: Deref<Target=str>> Eq for UniCase<S> {}
+
+#[allow(unstable)]
+impl<S: FromStr> FromStr for UniCase<S> {
+    fn from_str(s: &str) -> Option<UniCase<S>> {
+        s.parse().map(UniCase)
+    }
+}
 
 #[allow(unstable)]
 impl<H: hash::Writer + hash::Hasher, S: Deref<Target=str>> hash::Hash<H> for UniCase<S> {
