@@ -1,7 +1,7 @@
 [package]
 
 name = "unicase"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Sean McArthur <sean.monstar@gmail.com>"]
 description = "A case-insensitive wrapper around strings."
 license = "MIT"
