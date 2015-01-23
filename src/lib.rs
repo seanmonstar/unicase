@@ -23,7 +23,7 @@ use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
 
 /// Case Insensitive wrapper of strings.
-#[derive(Clone, Show)]
+#[derive(Clone, Debug)]
 pub struct UniCase<S>(pub S);
 
 impl<S> Deref for UniCase<S> {
@@ -51,10 +51,10 @@ impl<S: Deref<Target=str>> Str for UniCase<S> {
 }
 
 #[allow(unstable)]
-impl<S: fmt::String> fmt::String for UniCase<S> {
+impl<S: fmt::Display> fmt::Display for UniCase<S> {
     #[inline]
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        fmt::String::fmt(&self.0, fmt)
+        fmt::Display::fmt(&self.0, fmt)
     }
 }
 
