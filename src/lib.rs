@@ -1,5 +1,6 @@
 #![deny(missing_docs)]
 #![cfg_attr(test, deny(warnings))]
+#![feature(core, hash, std_misc)]
 
 //! # Case
 //!
@@ -41,7 +42,6 @@ impl<S> DerefMut for UniCase<S> {
     }
 }
 
-#[allow(unstable)]
 impl<S: Deref<Target=str>> Str for UniCase<S> {
     #[inline]
     fn as_slice(&self) -> &str {
@@ -50,7 +50,6 @@ impl<S: Deref<Target=str>> Str for UniCase<S> {
 
 }
 
-#[allow(unstable)]
 impl<S: fmt::Display> fmt::Display for UniCase<S> {
     #[inline]
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
@@ -60,7 +59,6 @@ impl<S: fmt::Display> fmt::Display for UniCase<S> {
 
 impl<S: Deref<Target=str>> PartialEq for UniCase<S> {
     #[inline]
-    #[allow(unstable)]
     fn eq(&self, other: &UniCase<S>) -> bool {
         self.eq_ignore_ascii_case(&***other)
     }
@@ -69,7 +67,6 @@ impl<S: Deref<Target=str>> PartialEq for UniCase<S> {
 
 impl<S: Deref<Target=str>> PartialEq<S> for UniCase<S> {
     #[inline]
-    #[allow(unstable)]
     fn eq(&self, other: &S) -> bool {
         self.eq_ignore_ascii_case(&**other)
     }
@@ -77,14 +74,13 @@ impl<S: Deref<Target=str>> PartialEq<S> for UniCase<S> {
 
 impl<S: Deref<Target=str>> Eq for UniCase<S> {}
 
-#[allow(unstable)]
 impl<S: FromStr> FromStr for UniCase<S> {
-    fn from_str(s: &str) -> Option<UniCase<S>> {
+    type Err = <S as FromStr>::Err;
+    fn from_str(s: &str) -> Result<UniCase<S>, <S as FromStr>::Err> {
         s.parse().map(UniCase)
     }
 }
 
-#[allow(unstable)]
 impl<H: hash::Writer + hash::Hasher, S: Deref<Target=str>> hash::Hash<H> for UniCase<S> {
     #[inline]
     fn hash(&self, hasher: &mut H) {
@@ -95,7 +91,6 @@ impl<H: hash::Writer + hash::Hasher, S: Deref<Target=str>> hash::Hash<H> for Uni
 }
 
 #[test]
-#[allow(unstable)]
 fn test_case_insensitive() {
     use std::hash::{hash, SipHasher};
 
