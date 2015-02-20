@@ -1,6 +1,7 @@
 #![deny(missing_docs)]
 #![cfg_attr(test, deny(warnings))]
-#![feature(core, hash, std_misc)]
+#![cfg_attr(test, feature(hash))]
+#![feature(core)]
 
 //! # Case
 //!
@@ -81,9 +82,9 @@ impl<S: FromStr> FromStr for UniCase<S> {
     }
 }
 
-impl<H: hash::Writer + hash::Hasher, S: Deref<Target=str>> hash::Hash<H> for UniCase<S> {
+impl<S: Deref<Target=str>> hash::Hash for UniCase<S> {
     #[inline]
-    fn hash(&self, hasher: &mut H) {
+    fn hash<H: hash::Hasher>(&self, hasher: &mut H) {
         for byte in self.as_slice().bytes().map(|b| b.to_ascii_lowercase()) {
             hasher.write(&[byte]);
         }
