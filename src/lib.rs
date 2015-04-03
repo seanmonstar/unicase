@@ -1,7 +1,5 @@
 #![deny(missing_docs)]
 #![cfg_attr(test, deny(warnings))]
-#![cfg_attr(test, feature(hash))]
-#![feature(core)]
 
 //! # Case
 //!
@@ -43,10 +41,10 @@ impl<S> DerefMut for UniCase<S> {
     }
 }
 
-impl<S: Deref<Target=str>> Str for UniCase<S> {
+impl<S: AsRef<str>> AsRef<str> for UniCase<S> {
     #[inline]
-    fn as_slice(&self) -> &str {
-        self.0.as_slice()
+    fn as_ref(&self) -> &str {
+        self.0.as_ref()
     }
 
 }
@@ -58,22 +56,22 @@ impl<S: fmt::Display> fmt::Display for UniCase<S> {
     }
 }
 
-impl<S: Deref<Target=str>> PartialEq for UniCase<S> {
+impl<S: AsRef<str>> PartialEq for UniCase<S> {
     #[inline]
     fn eq(&self, other: &UniCase<S>) -> bool {
-        self.eq_ignore_ascii_case(&***other)
+        self.as_ref().eq_ignore_ascii_case(other.as_ref())
     }
 }
 
 
-impl<S: Deref<Target=str>> PartialEq<S> for UniCase<S> {
+impl<S: AsRef<str>> PartialEq<S> for UniCase<S> {
     #[inline]
     fn eq(&self, other: &S) -> bool {
-        self.eq_ignore_ascii_case(&**other)
+        self.as_ref().eq_ignore_ascii_case(other.as_ref())
     }
 }
 
-impl<S: Deref<Target=str>> Eq for UniCase<S> {}
+impl<S: AsRef<str>> Eq for UniCase<S> {}
 
 impl<S: FromStr> FromStr for UniCase<S> {
     type Err = <S as FromStr>::Err;
@@ -82,10 +80,10 @@ impl<S: FromStr> FromStr for UniCase<S> {
     }
 }
 
-impl<S: Deref<Target=str>> hash::Hash for UniCase<S> {
+impl<S: AsRef<str>> hash::Hash for UniCase<S> {
     #[inline]
     fn hash<H: hash::Hasher>(&self, hasher: &mut H) {
-        for byte in self.as_slice().bytes().map(|b| b.to_ascii_lowercase()) {
+        for byte in self.as_ref().bytes().map(|b| b.to_ascii_lowercase()) {
             hasher.write(&[byte]);
         }
     }
