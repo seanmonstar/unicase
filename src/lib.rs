@@ -1,4 +1,4 @@
-#![deny(missing_docs)]
+#![cfg_attr(test, deny(missing_docs))]
 #![cfg_attr(test, deny(warnings))]
 
 //! # Case
