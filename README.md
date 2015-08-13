@@ -4,6 +4,12 @@
 
 Compare strings when case is not important.
 
+```rust
+if UniCase(method) == UniCase('GET') {
+    // GET request
+}
+```
+
 ## License
 
 [MIT](./LICENSE)
