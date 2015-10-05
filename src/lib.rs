@@ -18,7 +18,7 @@
 
 use std::ascii::AsciiExt;
 use std::fmt;
-use std::hash;
+use std::hash::{Hash, Hasher};
 use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
 
@@ -80,9 +80,9 @@ impl<S: FromStr> FromStr for UniCase<S> {
     }
 }
 
-impl<S: AsRef<str>> hash::Hash for UniCase<S> {
+impl<S: AsRef<str>> Hash for UniCase<S> {
     #[inline]
-    fn hash<H: hash::Hasher>(&self, hasher: &mut H) {
+    fn hash<H: Hasher>(&self, hasher: &mut H) {
         for byte in self.as_ref().bytes().map(|b| b.to_ascii_lowercase()) {
             hasher.write(&[byte]);
         }
