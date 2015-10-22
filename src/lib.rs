@@ -18,7 +18,7 @@
 
 use std::ascii::AsciiExt;
 use std::fmt;
-use std::hash;
+use std::hash::{Hash, Hasher};
 use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
 
@@ -80,22 +80,32 @@ impl<S: FromStr> FromStr for UniCase<S> {
     }
 }
 
-impl<S: AsRef<str>> hash::Hash for UniCase<S> {
+impl<S: AsRef<str>> Hash for UniCase<S> {
     #[inline]
-    fn hash<H: hash::Hasher>(&self, hasher: &mut H) {
+    fn hash<H: Hasher>(&self, hasher: &mut H) {
         for byte in self.as_ref().bytes().map(|b| b.to_ascii_lowercase()) {
             hasher.write(&[byte]);
         }
     }
 }
 
-#[test]
-fn test_case_insensitive() {
-    use std::hash::{hash, SipHasher};
+#[cfg(test)]
+mod test {
+    use super::UniCase;
+    use std::hash::{Hash, Hasher, SipHasher};
 
-    let a = UniCase("foobar");
-    let b = UniCase("FOOBAR");
+    fn hash<T: Hash>(t: &T) -> u64 {
+        let mut s = SipHasher::new();
+        t.hash(&mut s);
+        s.finish()
+    }
 
-    assert_eq!(a, b);
-    assert_eq!(hash::<_, SipHasher>(&a), hash::<_, SipHasher>(&b));
+    #[test]
+    fn test_case_insensitive() {
+        let a = UniCase("foobar");
+        let b = UniCase("FOOBAR");
+
+        assert_eq!(a, b);
+        assert_eq!(hash(&a), hash(&b));
+    }
 }
