@@ -92,6 +92,8 @@ impl<S: AsRef<str>> Hash for UniCase<S> {
 #[cfg(test)]
 mod test {
     use super::UniCase;
+    use std::borrow::Cow;
+    use std::collections::HashMap;
     use std::hash::{Hash, Hasher, SipHasher};
 
     fn hash<T: Hash>(t: &T) -> u64 {
@@ -107,5 +109,24 @@ mod test {
 
         assert_eq!(a, b);
         assert_eq!(hash(&a), hash(&b));
+    }
+
+    #[test]
+    fn test_borrow_impl() {
+        let owned: Cow<'static, str> = Cow::Owned(String::from("hElLO"));
+        let static_borrow: Cow<'static, str> = "Hello".into();
+
+        let mut map = HashMap::new();
+        let val = 42;
+        map.insert(UniCase(owned), val);
+
+        assert_eq!(map.get(&UniCase(static_borrow)), Some(&val));
+
+        fn get_shorter<'map, 'key>(map: &'map HashMap<UniCase<Cow<'static, str>>, u32>, s: &'key str) -> Option<&'map u32>{
+            let fn_borrow: Cow<'key, str> = s.into();
+            map.get::<UniCase<Cow<'key, str>>>(&UniCase(fn_borrow))
+        }
+
+        assert_eq!(get_shorter(&map, "hello"), Some(&val))
     }
 }
