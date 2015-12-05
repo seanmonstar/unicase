@@ -17,6 +17,7 @@
 //! ```
 
 use std::ascii::AsciiExt;
+use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Deref, DerefMut};
@@ -38,6 +39,20 @@ impl<S> DerefMut for UniCase<S> {
     #[inline]
     fn deref_mut<'a>(&'a mut self) -> &'a mut S {
         &mut self.0
+    }
+}
+
+impl<T: AsRef<str>> PartialOrd for UniCase<T> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl<T: AsRef<str>> Ord for UniCase<T> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let self_chars = self.as_ref().chars().map(|c| c.to_ascii_lowercase());
+        let other_chars = other.as_ref().chars().map(|c| c.to_ascii_lowercase());
+        self_chars.cmp(other_chars)
     }
 }
 
@@ -107,5 +122,17 @@ mod test {
 
         assert_eq!(a, b);
         assert_eq!(hash(&a), hash(&b));
+    }
+
+    #[test]
+    fn test_case_cmp() {
+        assert!(UniCase("foobar") == UniCase("FOOBAR"));
+        assert!(UniCase("a") < UniCase("B"));
+
+        assert!(UniCase("A") < UniCase("b"));
+        assert!(UniCase("aa") > UniCase("a"));
+
+        assert!(UniCase("a") < UniCase("aa"));
+        assert!(UniCase("a") < UniCase("AA"));
     }
 }
