@@ -1,5 +1,7 @@
 #![cfg_attr(test, deny(missing_docs))]
 #![cfg_attr(test, deny(warnings))]
+#![cfg_attr(feature = "heap_size", feature(custom_derive, plugin))]
+#![cfg_attr(feature = "heap_size", plugin(heapsize_plugin))]
 
 //! # Case
 //!
@@ -16,6 +18,9 @@
 //! assert_eq!(a, b);
 //! ```
 
+#[cfg(feature = "heap_size")]
+extern crate heapsize;
+
 use std::ascii::AsciiExt;
 #[cfg(iter_cmp)]
 use std::cmp::Ordering;
@@ -26,6 +31,7 @@ use std::str::FromStr;
 
 /// Case Insensitive wrapper of strings.
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct UniCase<S>(pub S);
 
 impl<S> Deref for UniCase<S> {
