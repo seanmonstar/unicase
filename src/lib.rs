@@ -80,20 +80,13 @@ impl<S: fmt::Display> fmt::Display for UniCase<S> {
     }
 }
 
-impl<S: AsRef<str>> PartialEq for UniCase<S> {
+impl<S1: AsRef<str>, S2: AsRef<str>> PartialEq<S2> for UniCase<S1> {
     #[inline]
-    fn eq(&self, other: &UniCase<S>) -> bool {
+    fn eq(&self, other: &S2) -> bool {
         self.as_ref().eq_ignore_ascii_case(other.as_ref())
     }
 }
 
-
-impl<S: AsRef<str>> PartialEq<S> for UniCase<S> {
-    #[inline]
-    fn eq(&self, other: &S) -> bool {
-        self.as_ref().eq_ignore_ascii_case(other.as_ref())
-    }
-}
 
 impl<S: AsRef<str>> Eq for UniCase<S> {}
 
@@ -131,6 +124,14 @@ mod test {
 
         assert_eq!(a, b);
         assert_eq!(hash(&a), hash(&b));
+    }
+
+    #[test]
+    fn test_different_string_types() {
+        let a = UniCase("foobar");
+        let b = "FOOBAR".to_owned();
+        assert_eq!(a, b);
+        assert_eq!(UniCase(b), a);
     }
 
     #[cfg(iter_cmp)]
