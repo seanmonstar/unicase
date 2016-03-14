@@ -106,6 +106,22 @@ impl<S: AsRef<str>> Hash for UniCase<S> {
     }
 }
 
+macro_rules! from_impl {
+    ($from:ty => $to:ty; $by:ident) => (
+        impl<'a> From<$from> for UniCase<$to> {
+            fn from(s: $from) -> Self {
+                UniCase(s.$by())
+            }
+        }
+    );
+    ($from:ty => $to:ty) => ( from_impl!($from => $to; into); )
+}
+
+from_impl!(&'a str => &'a str);
+from_impl!(&'a str => String);
+from_impl!(&'a String => &'a str; as_ref);
+from_impl!(String => String);
+
 #[cfg(test)]
 mod test {
     use super::UniCase;
@@ -145,5 +161,17 @@ mod test {
 
         assert!(UniCase("a") < UniCase("aa"));
         assert!(UniCase("a") < UniCase("AA"));
+    }
+
+    #[test]
+    fn test_from_impls() {
+        let view: &'static str = "foobar";
+        let _: UniCase<&'static str> = view.into();
+        let _: UniCase<&str> = view.into();
+        let _: UniCase<String> = view.into();
+
+        let owned: String = view.to_owned();
+        let _: UniCase<&str> = (&owned).into();
+        let _: UniCase<String> = owned.into();
     }
 }
