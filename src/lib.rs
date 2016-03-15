@@ -30,7 +30,7 @@ use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
 
 /// Case Insensitive wrapper of strings.
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 #[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct UniCase<S>(pub S);
 
@@ -131,6 +131,15 @@ mod test {
         let mut s = SipHasher::new();
         t.hash(&mut s);
         s.finish()
+    }
+
+    #[test]
+    fn test_copy_for_refs() {
+        fn foo<T>(_: UniCase<T>) {}
+
+        let a = UniCase("foobar");
+        foo(a);
+        foo(a);
     }
 
     #[test]
