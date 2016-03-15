@@ -117,10 +117,23 @@ macro_rules! from_impl {
     ($from:ty => $to:ty) => ( from_impl!($from => $to; into); )
 }
 
+macro_rules! into_impl {
+    ($to:ty) => (
+        impl<'a> Into<$to> for UniCase<$to> {
+            fn into(self) -> $to {
+                self.0
+            }
+        }
+    );
+}
+
 from_impl!(&'a str => &'a str);
 from_impl!(&'a str => String);
 from_impl!(&'a String => &'a str; as_ref);
 from_impl!(String => String);
+
+into_impl!(&'a str);
+into_impl!(String);
 
 #[cfg(test)]
 mod test {
@@ -182,5 +195,16 @@ mod test {
         let owned: String = view.to_owned();
         let _: UniCase<&str> = (&owned).into();
         let _: UniCase<String> = owned.into();
+    }
+
+    #[test]
+    fn test_into_impls() {
+        let view: UniCase<&'static str> = UniCase("foobar");
+        let _: &'static str = view.into();
+        let _: &str = view.into();
+
+        let owned: UniCase<String> = "foobar".into();
+        let _: String = owned.clone().into();
+        let _: &str = owned.as_ref();
     }
 }
