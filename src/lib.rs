@@ -30,7 +30,7 @@ use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
 
 /// Case Insensitive wrapper of strings.
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 #[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct UniCase<S>(pub S);
 
@@ -106,6 +106,35 @@ impl<S: AsRef<str>> Hash for UniCase<S> {
     }
 }
 
+macro_rules! from_impl {
+    ($from:ty => $to:ty; $by:ident) => (
+        impl<'a> From<$from> for UniCase<$to> {
+            fn from(s: $from) -> Self {
+                UniCase(s.$by())
+            }
+        }
+    );
+    ($from:ty => $to:ty) => ( from_impl!($from => $to; into); )
+}
+
+macro_rules! into_impl {
+    ($to:ty) => (
+        impl<'a> Into<$to> for UniCase<$to> {
+            fn into(self) -> $to {
+                self.0
+            }
+        }
+    );
+}
+
+from_impl!(&'a str => &'a str);
+from_impl!(&'a str => String);
+from_impl!(&'a String => &'a str; as_ref);
+from_impl!(String => String);
+
+into_impl!(&'a str);
+into_impl!(String);
+
 #[cfg(test)]
 mod test {
     use super::UniCase;
@@ -115,6 +144,15 @@ mod test {
         let mut s = SipHasher::new();
         t.hash(&mut s);
         s.finish()
+    }
+
+    #[test]
+    fn test_copy_for_refs() {
+        fn foo<T>(_: UniCase<T>) {}
+
+        let a = UniCase("foobar");
+        foo(a);
+        foo(a);
     }
 
     #[test]
@@ -145,5 +183,28 @@ mod test {
 
         assert!(UniCase("a") < UniCase("aa"));
         assert!(UniCase("a") < UniCase("AA"));
+    }
+
+    #[test]
+    fn test_from_impls() {
+        let view: &'static str = "foobar";
+        let _: UniCase<&'static str> = view.into();
+        let _: UniCase<&str> = view.into();
+        let _: UniCase<String> = view.into();
+
+        let owned: String = view.to_owned();
+        let _: UniCase<&str> = (&owned).into();
+        let _: UniCase<String> = owned.into();
+    }
+
+    #[test]
+    fn test_into_impls() {
+        let view: UniCase<&'static str> = UniCase("foobar");
+        let _: &'static str = view.into();
+        let _: &str = view.into();
+
+        let owned: UniCase<String> = "foobar".into();
+        let _: String = owned.clone().into();
+        let _: &str = owned.as_ref();
     }
 }
