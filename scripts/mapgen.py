@@ -1,8 +1,18 @@
 from os import path
 
+def variant(num):
+    if num == 1:
+        return 'Fold::One'
+    elif num == 2:
+        return 'Fold::Two'
+    elif num == 3:
+        return 'Fold::Three'
+
 def replacement(chars):
-    inside = ', '.join(["'\\u{%s}'" % c for c in chars.split(' ')])
-    return '(%s,)' % inside
+    chars = chars.split(' ')
+    chars_len = len(chars)
+    inside = ', '.join(["'\\u{%s}'" % c for c in chars])
+    return '%s(%s,)' % (variant(chars_len), inside)
 
 
 txt = open('./scripts/CaseFolding.txt')
@@ -18,8 +28,8 @@ for line in txt.readlines():
         if len(parts) > 2 and parts[1] in 'CF':
             #if ' ' in parts[2]:
             #    rs.write('//')
-            rs.write("        0x%s => %s.into(),\n" % (parts[0], replacement(parts[2])))
-rs.write('        _ => (orig,).into()\n')
+            rs.write("        0x%s => %s,\n" % (parts[0], replacement(parts[2])))
+rs.write('        _ => Fold::One(orig,)\n')
 rs.write('    }\n')
 rs.write('}\n')
 

@@ -95,6 +95,9 @@ macro_rules! inner {
 }
 
 impl<S: AsRef<str>> UniCase<S> {
+    /// Creates a new `UniCase`.
+    ///
+    /// Note: This scans the text to determine if it is all ASCII or not.
     pub fn new(s: S) -> UniCase<S> {
         use std::ascii::AsciiExt;
         if s.as_ref().is_ascii() {
@@ -102,6 +105,11 @@ impl<S: AsRef<str>> UniCase<S> {
         } else {
             UniCase(Encoding::Unicode(Unicode(s)))
         }
+    }
+
+    /// Creates a new `UniCase`, skipping a ASCII check.
+    pub fn unicode(s: S) -> UniCase<S> {
+        UniCase(Encoding::Unicode(Unicode(s)))
     }
 }
 
@@ -171,7 +179,7 @@ macro_rules! from_impl {
     ($from:ty => $to:ty; $by:ident) => (
         impl<'a> From<$from> for UniCase<$to> {
             fn from(s: $from) -> Self {
-                UniCase::new(s.$by())
+                UniCase::unicode(s.$by())
             }
         }
     );

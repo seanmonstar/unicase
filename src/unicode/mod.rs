@@ -42,8 +42,8 @@ impl<S: AsRef<str>> Hash for Unicode<S> {
     fn hash<H: Hasher>(&self, hasher: &mut H) {
         let mut buf = [0; 4];
         for c in self.0.as_ref().chars().flat_map(|c| lookup(c)) {
-            let idx = char_to_utf8(c, &mut buf);
-            hasher.write(&buf[..idx])
+            let len = char_to_utf8(c, &mut buf);
+            hasher.write(&buf[..len])
         }
     }
 }
