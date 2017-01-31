@@ -44,7 +44,7 @@
 #[cfg(feature = "nightly")]
 extern crate test;
 
-#[cfg(iter_cmp)]
+#[cfg(__unicase__iter_cmp)]
 use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};
@@ -200,7 +200,7 @@ from_impl!(String => String);
 into_impl!(&'a str);
 into_impl!(String);
 
-#[cfg(iter_cmp)]
+#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> PartialOrd for UniCase<T> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -208,7 +208,7 @@ impl<T: AsRef<str>> PartialOrd for UniCase<T> {
     }
 }
 
-#[cfg(iter_cmp)]
+#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> Ord for UniCase<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
@@ -299,7 +299,7 @@ mod tests {
         b.iter(|| assert!(::std::str::from_utf8(SUBJECT).is_ok()));
     }
 
-    #[cfg(iter_cmp)]
+    #[cfg(__unicase__iter_cmp)]
     #[test]
     fn test_case_cmp() {
         assert!(UniCase::new("a") < UniCase::new("B"));

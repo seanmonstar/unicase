@@ -1,5 +1,5 @@
 use std::ascii::AsciiExt;
-#[cfg(iter_cmp)]
+#[cfg(__unicase__iter_cmp)]
 use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};
@@ -30,14 +30,14 @@ impl<S> DerefMut for Ascii<S> {
     }
 }
 
-#[cfg(iter_cmp)]
+#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> PartialOrd for Ascii<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-#[cfg(iter_cmp)]
+#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> Ord for Ascii<T> {
     fn cmp(&self, other: &Self) -> Ordering {
         let self_chars = self.as_ref().chars().map(|c| c.to_ascii_lowercase());
@@ -114,7 +114,7 @@ mod tests {
         b.iter(|| assert_eq!(Ascii("foobar"), Ascii("FOOBAR")));
     }
 
-    #[cfg(iter_cmp)]
+    #[cfg(__unicase__iter_cmp)]
     #[test]
     fn test_case_cmp() {
         assert!(Ascii("foobar") == Ascii("FOOBAR"));

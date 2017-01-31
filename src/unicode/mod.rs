@@ -1,3 +1,4 @@
+#[cfg(__unicase__iter_cmp)]
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 
@@ -18,7 +19,7 @@ impl<S1: AsRef<str>, S2: AsRef<str>> PartialEq<Unicode<S2>> for Unicode<S1> {
 
 impl<S: AsRef<str>> Eq for Unicode<S> {}
 
-#[cfg(iter_cmp)]
+#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> PartialOrd for Unicode<T> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -26,7 +27,7 @@ impl<T: AsRef<str>> PartialOrd for Unicode<T> {
     }
 }
 
-#[cfg(iter_cmp)]
+#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> Ord for Unicode<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
