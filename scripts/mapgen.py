@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from os import path
 
 def variant(num):
