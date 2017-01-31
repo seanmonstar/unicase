@@ -89,10 +89,11 @@ impl<S: AsRef<str>> Hash for Ascii<S> {
 #[cfg(test)]
 mod tests {
     use ::Ascii;
-    use std::hash::{Hash, Hasher, SipHasher};
+    use std::hash::{Hash, Hasher};
+    use std::collections::hash_map::DefaultHasher;
 
     fn hash<T: Hash>(t: &T) -> u64 {
-        let mut s = SipHasher::new();
+        let mut s = DefaultHasher::new();
         t.hash(&mut s);
         s.finish()
     }
