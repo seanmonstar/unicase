@@ -5,7 +5,6 @@ use self::map::lookup;
 mod map;
 
 #[derive(Clone, Copy, Debug)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct Unicode<S>(pub S);
 
 impl<S1: AsRef<str>, S2: AsRef<str>> PartialEq<Unicode<S2>> for Unicode<S1> {
@@ -53,7 +52,7 @@ fn char_to_utf8(c: char, dst: &mut [u8; 4]) -> usize {
     const TAG_CONT: u8    = 0b1000_0000;
     const TAG_TWO_B: u8   = 0b1100_0000;
     const TAG_THREE_B: u8 = 0b1110_0000;
-    const TAG_FOUR_B: u8 = 0b1111_0000;
+    const TAG_FOUR_B: u8  = 0b1111_0000;
 
     let code = c as u32;
     if code <= 0x7F {

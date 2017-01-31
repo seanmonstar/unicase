@@ -1,7 +1,5 @@
 #![cfg_attr(test, deny(missing_docs))]
 #![cfg_attr(test, deny(warnings))]
-#![cfg_attr(feature = "heap_size", feature(custom_derive, plugin))]
-#![cfg_attr(feature = "heap_size", plugin(heapsize_plugin))]
 #![cfg_attr(feature = "nightly", feature(test))]
 
 //! # UniCase
@@ -43,8 +41,6 @@
 //! assert_eq!(a, b);
 //! ```
 
-#[cfg(feature = "heap_size")]
-extern crate heapsize;
 #[cfg(feature = "nightly")]
 extern crate test;
 
@@ -62,17 +58,14 @@ mod unicode;
 
 /// Case Insensitive wrapper of strings.
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct UniCase<S>(Encoding<S>);
 
 /// Case Insensitive wrapper of Ascii strings.
 #[derive(Clone, Copy, Debug)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct Ascii<S>(S);
 
 
 #[derive(Clone, Copy, Debug)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 enum Encoding<S> {
     Ascii(Ascii<S>),
     Unicode(Unicode<S>),
@@ -107,7 +100,7 @@ impl<S: AsRef<str>> UniCase<S> {
         }
     }
 
-    /// Creates a new `UniCase`, skipping a ASCII check.
+    /// Creates a new `UniCase`, skipping the ASCII check.
     pub fn unicode(s: S) -> UniCase<S> {
         UniCase(Encoding::Unicode(Unicode(s)))
     }
