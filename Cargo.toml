@@ -5,8 +5,12 @@ version = "2.0.0-a.0"
 authors = ["Sean McArthur <sean.monstar@gmail.com>"]
 description = "A case-insensitive wrapper around strings."
 repository = "https://github.com/seanmonstar/unicase"
-license = "MIT"
+license = "MIT/Apache-2.0"
 keywords = ["lowercase", "case", "case-insensitive"]
+
+exclude = [
+    "scripts/"
+]
 
 build = "build.rs"
 
