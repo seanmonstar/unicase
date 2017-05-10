@@ -11,6 +11,9 @@ keywords = ["lowercase", "case", "case-insensitive"]
 build = "build.rs"
 
 [build-dependencies]
+# rustc_version must stay on 0.1 for now, since the minimum working
+# rustc for unicase is 1.3, and newer rustc_version requires a newer
+# compiler.
 rustc_version = "0.1"
 
 [features]
