@@ -64,6 +64,21 @@ pub struct UniCase<S>(Encoding<S>);
 #[derive(Clone, Copy, Debug)]
 pub struct Ascii<S>(S);
 
+/// Compare two string-like types for case-less equality, using unicode folding.
+///
+/// Equivalent to `UniCase::new(left) == UniCase::new(right)`.
+#[inline]
+pub fn eq<S: AsRef<str> + ?Sized>(left: &S, right: &S) -> bool {
+    UniCase::new(left) == UniCase::new(right)
+}
+
+/// Compare two string-like types for case-less equality, ignoring ASCII case.
+///
+/// Equivalent to `Ascii::new(left) == Ascii::new(right)`.
+#[inline]
+pub fn eq_ascii<S: AsRef<str> + ?Sized>(left: &S, right: &S) -> bool {
+    Ascii(left) == Ascii(right)
+}
 
 #[derive(Clone, Copy, Debug)]
 enum Encoding<S> {

@@ -32,6 +32,7 @@ impl<S> DerefMut for Ascii<S> {
 
 #[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> PartialOrd for Ascii<T> {
+    #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
@@ -39,6 +40,7 @@ impl<T: AsRef<str>> PartialOrd for Ascii<T> {
 
 #[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> Ord for Ascii<T> {
+    #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         let self_chars = self.as_ref().chars().map(|c| c.to_ascii_lowercase());
         let other_chars = other.as_ref().chars().map(|c| c.to_ascii_lowercase());
@@ -61,9 +63,23 @@ impl<S: fmt::Display> fmt::Display for Ascii<S> {
     }
 }
 
-impl<S1: AsRef<str>, S2: AsRef<str>> PartialEq<Ascii<S2>> for Ascii<S1> {
+impl<S1: AsRef<str>> PartialEq<Ascii<S1>> for String {
     #[inline]
-    fn eq(&self, other: &Ascii<S2>) -> bool {
+    fn eq(&self, other: &Ascii<S1>) -> bool {
+        other == self
+    }
+}
+
+impl<'a, S1: AsRef<str>> PartialEq<Ascii<S1>> for &'a str {
+    #[inline]
+    fn eq(&self, other: &Ascii<S1>) -> bool {
+        other == self
+    }
+}
+
+impl<S1: AsRef<str>, S2: AsRef<str>> PartialEq<S2> for Ascii<S1> {
+    #[inline]
+    fn eq(&self, other: &S2) -> bool {
         self.as_ref().eq_ignore_ascii_case(other.as_ref())
     }
 }
@@ -108,6 +124,11 @@ mod tests {
 
         assert_eq!(a, b);
         assert_eq!(hash(&a), hash(&b));
+
+        assert_eq!(a, "fooBar");
+        assert_eq!("fooBar", a);
+        assert_eq!(String::from("fooBar"), a);
+        assert_eq!(a, String::from("fooBar"));
     }
 
     #[cfg(feature = "nightly")]
