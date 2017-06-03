@@ -22,7 +22,7 @@
 extern crate heapsize;
 
 use std::ascii::AsciiExt;
-#[cfg(iter_cmp)]
+#[cfg(__unicase__iter_cmp)]
 use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};
@@ -49,14 +49,14 @@ impl<S> DerefMut for UniCase<S> {
     }
 }
 
-#[cfg(iter_cmp)]
+#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> PartialOrd for UniCase<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-#[cfg(iter_cmp)]
+#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> Ord for UniCase<T> {
     fn cmp(&self, other: &Self) -> Ordering {
         let self_chars = self.as_ref().chars().map(|c| c.to_ascii_lowercase());
@@ -172,7 +172,7 @@ mod test {
         assert_eq!(UniCase(b), a);
     }
 
-    #[cfg(iter_cmp)]
+    #[cfg(__unicase__iter_cmp)]
     #[test]
     fn test_case_cmp() {
         assert!(UniCase("foobar") == UniCase("FOOBAR"));
