@@ -40,9 +40,26 @@
 //!
 //! assert_eq!(a, b);
 //! ```
+//!
+//! ## serde Support
+//! Support for serialization and deserialization using
+//! [serde](https://serde.rs/) is enabled with the `serde` feature flag.
+//! You can usually derive or implement `Serialize`
+//! and `Deserialize` directly without any issues. Refer to the `serde`
+//! module for examples.
+//!
+//! If your usage includes borrowed data, refer to the `serde` module
+//! for more details.
 
 #[cfg(feature = "nightly")]
 extern crate test;
+#[cfg(feature = "serde")]
+extern crate serde as serdelib;
+#[cfg(all(test, feature = "serde"))]
+#[macro_use]
+extern crate serde_derive;
+#[cfg(all(test, feature = "serde"))]
+extern crate serde_test;
 
 #[cfg(__unicase__iter_cmp)]
 use std::cmp::Ordering;
@@ -55,6 +72,8 @@ use self::unicode::Unicode;
 
 mod ascii;
 mod unicode;
+#[cfg(feature = "serde")]
+pub mod serde;
 
 /// Case Insensitive wrapper of strings.
 #[derive(Clone, Copy)]

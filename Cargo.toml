@@ -14,8 +14,20 @@ exclude = [
 
 build = "build.rs"
 
+[features]
+default = []
+
+nightly = []
+
+[dependencies]
+serde = { version = "1.0", optional = true }
+
 [build-dependencies]
 version_check = "0.1"
 
-[features]
-nightly = []
+[dev-dependencies]
+serde_derive = "1.0"
+serde_test = "1.0"
+
+[package.metadata.docs.rs]
+features = ["serde"]
