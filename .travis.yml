@@ -5,10 +5,15 @@ matrix:
     fast_finish: true
     include:
         - rust: nightly
+          env: FEATURES="--all-features"
+        - rust: nightly
           env: FEATURES="--features nightly"
         - rust: beta
+        - rust: beta
+          env: FEATURES="--features serde"
         - rust: stable
-        - rust: 1.3.0
+        - rust: stable
+          env: FEATURES="--features serde"
 
 cache:
     apt: true
