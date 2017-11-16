@@ -110,6 +110,7 @@ impl<S: AsRef<str>> UniCase<S> {
     ///
     /// Note: This scans the text to determine if it is all ASCII or not.
     pub fn new(s: S) -> UniCase<S> {
+        #[allow(unused)]
         use std::ascii::AsciiExt;
         if s.as_ref().is_ascii() {
             UniCase(Encoding::Ascii(Ascii(s)))
@@ -304,6 +305,7 @@ mod tests {
     #[cfg(feature = "nightly")]
     #[inline(never)]
     fn is_ascii(bytes: &[u8]) -> bool {
+        #[allow(unused)]
         use std::ascii::AsciiExt;
         bytes.is_ascii()
     }
