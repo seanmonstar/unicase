@@ -111,7 +111,7 @@ impl<S: AsRef<str>> UniCase<S> {
     ///
     /// Note: This scans the text to determine if it is all ASCII or not.
     pub fn new(s: S) -> UniCase<S> {
-        #[allow(unused)]
+        #[allow(deprecated, unused)]
         use std::ascii::AsciiExt;
         if s.as_ref().is_ascii() {
             UniCase(Encoding::Ascii(Ascii(s)))

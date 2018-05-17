@@ -1,4 +1,4 @@
-#[allow(unused)]
+#[allow(deprecated, unused)]
 use std::ascii::AsciiExt;
 #[cfg(__unicase__iter_cmp)]
 use std::cmp::Ordering;
