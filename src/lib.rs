@@ -254,9 +254,9 @@ impl<S: FromStr + AsRef<str>> FromStr for UniCase<S> {
 mod tests {
     use super::UniCase;
     use std::hash::{Hash, Hasher};
-    #[cfg(not(__unicase__defauler_hasher))]
+    #[cfg(not(__unicase__default_hasher))]
     use std::hash::SipHasher as DefaultHasher;
-    #[cfg(__unicase__defauler_hasher)]
+    #[cfg(__unicase__default_hasher)]
     use std::collections::hash_map::DefaultHasher;
 
     fn hash<T: Hash>(t: &T) -> u64 {
