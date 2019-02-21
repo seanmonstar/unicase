@@ -235,16 +235,13 @@ impl<S: AsRef<str>> From<S> for UniCase<S> {
 
 from_impl!(&'a str => Cow<'a, str>);
 from_impl!(String => Cow<'a, str>);
-from_impl!(String => Box<str>);
 from_impl!(&'a str => String);
-from_impl!(Cow<'a, str> => String);
-from_impl!(Box<str> => String);
+from_impl!(Cow<'a, str> => String; into_owned);
 from_impl!(&'a String => &'a str; as_ref);
 
 into_impl!(&'a str);
 into_impl!(String);
 into_impl!(Cow<'a, str>);
-into_impl!(Box<str>);
 
 #[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> PartialOrd for UniCase<T> {
