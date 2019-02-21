@@ -226,10 +226,14 @@ macro_rules! into_impl {
     );
 }
 
-from_impl!(&'a str => &'a str);
+impl<S: AsRef<str>> From<S> for UniCase<S> {
+    fn from(s: S) -> Self {
+        UniCase::unicode(s)
+    }
+}
+
 from_impl!(&'a str => String);
 from_impl!(&'a String => &'a str; as_ref);
-from_impl!(String => String);
 
 into_impl!(&'a str);
 into_impl!(String);
