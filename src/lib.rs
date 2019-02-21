@@ -329,7 +329,7 @@ mod tests {
     #[cfg(feature = "nightly")]
     #[inline(never)]
     fn is_ascii(bytes: &[u8]) -> bool {
-        #[allow(unused)]
+        #[allow(unused, deprecated)]
         use std::ascii::AsciiExt;
         bytes.is_ascii()
     }
