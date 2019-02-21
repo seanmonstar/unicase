@@ -62,7 +62,7 @@ mod unicode;
 pub struct UniCase<S>(Encoding<S>);
 
 /// Case Insensitive wrapper of Ascii strings.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Ascii<S>(S);
 
 /// Compare two string-like types for case-less equality, using unicode folding.
@@ -104,6 +104,12 @@ macro_rules! inner {
             &Encoding::Unicode(ref s) => &s.0,
         }
     });
+}
+
+impl<S: AsRef<str> + Default> Default for UniCase<S> {
+    fn default() -> Self {
+        Self::new(Default::default())
+    }
 }
 
 impl<S: AsRef<str>> UniCase<S> {
