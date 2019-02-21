@@ -14,6 +14,11 @@ impl<S> Ascii<S> {
     pub fn new(s: S) -> Ascii<S> {
         Ascii(s)
     }
+
+    #[inline]
+    pub fn into_inner(self) -> S {
+        self.0
+    }
 }
 
 impl<S> Deref for Ascii<S> {

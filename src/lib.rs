@@ -45,6 +45,7 @@
 #[cfg(feature = "nightly")]
 extern crate test;
 
+use std::borrow::Cow;
 #[cfg(__unicase__iter_cmp)]
 use std::cmp::Ordering;
 use std::fmt;
@@ -62,7 +63,7 @@ mod unicode;
 pub struct UniCase<S>(Encoding<S>);
 
 /// Case Insensitive wrapper of Ascii strings.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Ascii<S>(S);
 
 /// Compare two string-like types for case-less equality, using unicode folding.
@@ -106,6 +107,12 @@ macro_rules! inner {
     });
 }
 
+impl<S: AsRef<str> + Default> Default for UniCase<S> {
+    fn default() -> Self {
+        Self::new(Default::default())
+    }
+}
+
 impl<S: AsRef<str>> UniCase<S> {
     /// Creates a new `UniCase`.
     ///
@@ -123,6 +130,17 @@ impl<S: AsRef<str>> UniCase<S> {
     /// Creates a new `UniCase`, skipping the ASCII check.
     pub fn unicode(s: S) -> UniCase<S> {
         UniCase(Encoding::Unicode(Unicode(s)))
+    }
+}
+
+impl<S> UniCase<S> {
+    /// Unwraps the inner value held by this `UniCase`.
+    #[inline]
+    pub fn into_inner(self) -> S {
+        match self.0 {
+            Encoding::Ascii(s) => s.0,
+            Encoding::Unicode(s) => s.0,
+        }
     }
 }
 
@@ -203,22 +221,27 @@ macro_rules! into_impl {
     ($to:ty) => (
         impl<'a> Into<$to> for UniCase<$to> {
             fn into(self) -> $to {
-                match self.0 {
-                    Encoding::Ascii(Ascii(s)) => s,
-                    Encoding::Unicode(Unicode(s)) => s,
-                }
+                self.into_inner()
             }
         }
     );
 }
 
-from_impl!(&'a str => &'a str);
+impl<S: AsRef<str>> From<S> for UniCase<S> {
+    fn from(s: S) -> Self {
+        UniCase::unicode(s)
+    }
+}
+
+from_impl!(&'a str => Cow<'a, str>);
+from_impl!(String => Cow<'a, str>);
 from_impl!(&'a str => String);
+from_impl!(Cow<'a, str> => String; into_owned);
 from_impl!(&'a String => &'a str; as_ref);
-from_impl!(String => String);
 
 into_impl!(&'a str);
 into_impl!(String);
+into_impl!(Cow<'a, str>);
 
 #[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> PartialOrd for UniCase<T> {
@@ -306,7 +329,7 @@ mod tests {
     #[cfg(feature = "nightly")]
     #[inline(never)]
     fn is_ascii(bytes: &[u8]) -> bool {
-        #[allow(unused)]
+        #[allow(unused, deprecated)]
         use std::ascii::AsciiExt;
         bytes.is_ascii()
     }
