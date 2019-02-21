@@ -132,6 +132,17 @@ impl<S: AsRef<str>> UniCase<S> {
     }
 }
 
+impl<S> UniCase<S> {
+    /// Unwraps the inner value held by this `UniCase`.
+    #[inline]
+    pub fn into_inner(self) -> S {
+        match self.0 {
+            Encoding::Ascii(s) => s.0,
+            Encoding::Unicode(s) => s.0,
+        }
+    }
+}
+
 impl<S> Deref for UniCase<S> {
     type Target = S;
     #[inline]
@@ -209,10 +220,7 @@ macro_rules! into_impl {
     ($to:ty) => (
         impl<'a> Into<$to> for UniCase<$to> {
             fn into(self) -> $to {
-                match self.0 {
-                    Encoding::Ascii(Ascii(s)) => s,
-                    Encoding::Unicode(Unicode(s)) => s,
-                }
+                self.into_inner()
             }
         }
     );
