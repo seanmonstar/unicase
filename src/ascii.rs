@@ -11,7 +11,7 @@ use super::Ascii;
 
 impl<S> Ascii<S> {
     #[inline]
-    pub fn new(s: S) -> Ascii<S> {
+    pub const fn new(s: S) -> Ascii<S> {
         Ascii(s)
     }
 

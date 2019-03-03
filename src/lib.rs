@@ -126,14 +126,14 @@ impl<S: AsRef<str>> UniCase<S> {
             UniCase(Encoding::Unicode(Unicode(s)))
         }
     }
-
-    /// Creates a new `UniCase`, skipping the ASCII check.
-    pub fn unicode(s: S) -> UniCase<S> {
-        UniCase(Encoding::Unicode(Unicode(s)))
-    }
 }
 
 impl<S> UniCase<S> {
+    /// Creates a new `UniCase`, skipping the ASCII check.
+    pub const fn unicode(s: S) -> UniCase<S> {
+        UniCase(Encoding::Unicode(Unicode(s)))
+    }
+
     /// Unwraps the inner value held by this `UniCase`.
     #[inline]
     pub fn into_inner(self) -> S {
