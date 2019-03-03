@@ -5,7 +5,7 @@
 
 //! # UniCase
 //!
-//! UniCase provices a way of specifying strings that are case-insensitive.
+//! UniCase provides a way of specifying strings that are case-insensitive.
 //!
 //! UniCase supports full [Unicode case
 //! folding](https://www.w3.org/International/wiki/Case_folding). It can also
