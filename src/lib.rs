@@ -130,7 +130,16 @@ impl<S: AsRef<str>> UniCase<S> {
 
 impl<S> UniCase<S> {
     /// Creates a new `UniCase`, skipping the ASCII check.
+    #[cfg(__unicase__const_fns)]
     pub const fn unicode(s: S) -> UniCase<S> {
+        UniCase(Encoding::Unicode(Unicode(s)))
+    }
+
+    /// Creates a new `UniCase`, skipping the ASCII check.
+    ///
+    /// For Rust versions >= 1.31, this is a `const fn`.
+    #[cfg(not(__unicase__const_fns))]
+    pub fn unicode(s: S) -> UniCase<S> {
         UniCase(Encoding::Unicode(Unicode(s)))
     }
 
@@ -379,5 +388,11 @@ mod tests {
         let owned: UniCase<String> = "foobar".into();
         let _: String = owned.clone().into();
         let _: &str = owned.as_ref();
+    }
+
+    #[cfg(__unicase__const_fns)]
+    #[test]
+    fn test_unicase_unicode_const() {
+        const _UNICASE: UniCase<&'static str> = UniCase::unicode("");
     }
 }
