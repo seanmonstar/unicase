@@ -5,7 +5,7 @@
 
 //! # UniCase
 //!
-//! UniCase provices a way of specifying strings that are case-insensitive.
+//! UniCase provides a way of specifying strings that are case-insensitive.
 //!
 //! UniCase supports full [Unicode case
 //! folding](https://www.w3.org/International/wiki/Case_folding). It can also
@@ -126,14 +126,23 @@ impl<S: AsRef<str>> UniCase<S> {
             UniCase(Encoding::Unicode(Unicode(s)))
         }
     }
-
-    /// Creates a new `UniCase`, skipping the ASCII check.
-    pub fn unicode(s: S) -> UniCase<S> {
-        UniCase(Encoding::Unicode(Unicode(s)))
-    }
 }
 
 impl<S> UniCase<S> {
+    /// Creates a new `UniCase`, skipping the ASCII check.
+    #[cfg(__unicase__const_fns)]
+    pub const fn unicode(s: S) -> UniCase<S> {
+        UniCase(Encoding::Unicode(Unicode(s)))
+    }
+
+    /// Creates a new `UniCase`, skipping the ASCII check.
+    ///
+    /// For Rust versions >= 1.31, this is a `const fn`.
+    #[cfg(not(__unicase__const_fns))]
+    pub fn unicode(s: S) -> UniCase<S> {
+        UniCase(Encoding::Unicode(Unicode(s)))
+    }
+
     /// Unwraps the inner value held by this `UniCase`.
     #[inline]
     pub fn into_inner(self) -> S {
@@ -379,5 +388,11 @@ mod tests {
         let owned: UniCase<String> = "foobar".into();
         let _: String = owned.clone().into();
         let _: &str = owned.as_ref();
+    }
+
+    #[cfg(__unicase__const_fns)]
+    #[test]
+    fn test_unicase_unicode_const() {
+        const _UNICASE: UniCase<&'static str> = UniCase::unicode("");
     }
 }

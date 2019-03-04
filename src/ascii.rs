@@ -11,6 +11,16 @@ use super::Ascii;
 
 impl<S> Ascii<S> {
     #[inline]
+    #[cfg(__unicase__const_fns)]
+    pub const fn new(s: S) -> Ascii<S> {
+        Ascii(s)
+    }
+
+    /// Construct a new `Ascii`.
+    ///
+    /// For Rust versions >= 1.31, this is a `const fn`.
+    #[inline]
+    #[cfg(not(__unicase__const_fns))]
     pub fn new(s: S) -> Ascii<S> {
         Ascii(s)
     }
@@ -155,5 +165,11 @@ mod tests {
 
         assert!(Ascii("a") < Ascii("aa"));
         assert!(Ascii("a") < Ascii("AA"));
+    }
+
+    #[cfg(__unicase__const_fns)]
+    #[test]
+    fn test_ascii_new_const() {
+        const _ASCII: Ascii<&'static str> = Ascii::new("");
     }
 }

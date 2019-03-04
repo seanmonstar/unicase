@@ -9,6 +9,8 @@ matrix:
         - rust: beta
         - rust: stable
         - rust: 1.3.0
+        # verify `const fn`
+        - rust: 1.31.0
 
 cache:
     apt: true
