@@ -143,6 +143,28 @@ impl<S> UniCase<S> {
         UniCase(Encoding::Unicode(Unicode(s)))
     }
 
+    /// Creates a new `UniCase` which performs only ASCII case folding.
+    #[cfg(__unicase__const_fns)]
+    pub const fn ascii(s: S) -> UniCase<S> {
+        UniCase(Encoding::Ascii(Ascii(s)))
+    }
+
+    /// Creates a new `UniCase` which performs only ASCII case folding.
+    ///
+    /// For Rust versions >= 1.31, this is a `const fn`.
+    #[cfg(not(__unicase__const_fns))]
+    pub fn ascii(s: S) -> UniCase<S> {
+        UniCase(Encoding::Ascii(Ascii(s)))
+    }
+
+    /// Return `true` if this instance will only perform ASCII case folding.
+    pub fn is_ascii(&self) -> bool {
+        match self.0 {
+            Encoding::Ascii(_) => true,
+            Encoding::Unicode(_) => false,
+        }
+    }
+
     /// Unwraps the inner value held by this `UniCase`.
     #[inline]
     pub fn into_inner(self) -> S {
@@ -212,6 +234,12 @@ impl<S: AsRef<str>> Hash for UniCase<S> {
             Encoding::Ascii(ref s) => s.hash(hasher),
             Encoding::Unicode(ref s) => s.hash(hasher)
         }
+    }
+}
+
+impl<S> From<Ascii<S>> for UniCase<S> {
+    fn from(ascii: Ascii<S>) -> Self {
+        UniCase(Encoding::Ascii(ascii))
     }
 }
 
@@ -310,9 +338,15 @@ mod tests {
     fn test_eq_ascii() {
         let a = UniCase::new("foobar");
         let b = UniCase::new("FOOBAR");
+        let c = UniCase::ascii("FoObAr");
 
         assert_eq!(a, b);
+        assert_eq!(a, c);
         assert_eq!(hash(&a), hash(&b));
+        assert_eq!(hash(&a), hash(&c));
+        assert!(a.is_ascii());
+        assert!(b.is_ascii());
+        assert!(c.is_ascii());
     }
 
     #[test]
