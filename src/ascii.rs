@@ -7,7 +7,7 @@ use std::hash::{Hash, Hasher};
 use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
 
-use super::Ascii;
+use super::{Ascii, Encoding, UniCase};
 
 impl<S> Ascii<S> {
     #[inline]
@@ -23,6 +23,16 @@ impl<S> Ascii<S> {
     #[cfg(not(__unicase__const_fns))]
     pub fn new(s: S) -> Ascii<S> {
         Ascii(s)
+    }
+
+    #[cfg(__unicase_const_fns)]
+    pub const fn into_unicase(self) -> UniCase<S> {
+        UniCase(Encoding::Ascii(self))
+    }
+
+    #[cfg(not(__unicase_const_fns))]
+    pub fn into_unicase(self) -> UniCase<S> {
+        UniCase(Encoding::Ascii(self))
     }
 
     #[inline]
