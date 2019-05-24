@@ -16,7 +16,7 @@ exclude = [
 build = "build.rs"
 
 [build-dependencies]
-version_check = "0.1"
+version_check = "0.9"
 
 [features]
 nightly = []
