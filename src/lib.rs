@@ -45,6 +45,9 @@
 #[cfg(feature = "nightly")]
 extern crate test;
 
+#[cfg(target_arch = "wasm32")]
+extern crate js_sys;
+
 use std::borrow::Cow;
 #[cfg(__unicase__iter_cmp)]
 use std::cmp::Ordering;

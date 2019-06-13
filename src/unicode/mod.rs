@@ -1,19 +1,112 @@
+// On WASM targets, this includes a very large function, so on WASM we don't include it and use
+// js-sys's JsString bindings instead.
+#[cfg(not(target_arch = "wasm32"))]
+mod map;
+
 #[cfg(__unicase__iter_cmp)]
 use std::cmp::Ordering;
-use std::hash::{Hash, Hasher};
-
-use self::map::lookup;
-mod map;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Unicode<S>(pub S);
 
-impl<S1: AsRef<str>, S2: AsRef<str>> PartialEq<Unicode<S2>> for Unicode<S1> {
-    #[inline]
-    fn eq(&self, other: &Unicode<S2>) -> bool {
-        self.0.as_ref().chars().flat_map(lookup)
-            .zip(other.0.as_ref().chars().flat_map(lookup))
-            .all(|(a, b)| a == b)
+#[cfg(not(target_arch = "wasm32"))]
+mod default {
+    #[cfg(__unicase__iter_cmp)]
+    use std::cmp::Ordering;
+
+    use std::hash::{Hash, Hasher};
+
+    use super::map::lookup;
+    use super::{Unicode, char_to_utf8};
+
+    impl<S1: AsRef<str>, S2: AsRef<str>> PartialEq<Unicode<S2>> for Unicode<S1> {
+        #[inline]
+        fn eq(&self, other: &Unicode<S2>) -> bool {
+            self.0.as_ref().chars().flat_map(lookup)
+                .zip(other.0.as_ref().chars().flat_map(lookup))
+                .all(|(a, b)| a == b)
+        }
+    }
+
+    #[cfg(__unicase__iter_cmp)]
+    impl<T: AsRef<str>> Ord for Unicode<T> {
+        #[inline]
+        fn cmp(&self, other: &Self) -> Ordering {
+            let self_chars = self.0.as_ref().chars().flat_map(lookup);
+            let other_chars = other.0.as_ref().chars().flat_map(lookup);
+            self_chars.cmp(other_chars)
+        }
+    }
+
+    impl<S: AsRef<str>> Hash for Unicode<S> {
+        #[inline]
+        fn hash<H: Hasher>(&self, hasher: &mut H) {
+            let mut buf = [0; 4];
+            for c in self.0.as_ref().chars().flat_map(|c| lookup(c)) {
+                let len = char_to_utf8(c, &mut buf);
+                hasher.write(&buf[..len])
+            }
+        }
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+mod wasm {
+    #[cfg(__unicase__iter_cmp)]
+    use std::cmp::Ordering;
+
+    use std::hash::{Hash, Hasher};
+
+    use js_sys::{JsString, Array, Object, Reflect};
+
+    use super::{Unicode, char_to_utf8};
+
+    impl<S1: AsRef<str>, S2: AsRef<str>> PartialEq<Unicode<S2>> for Unicode<S1> {
+        #[inline]
+        fn eq(&self, other: &Unicode<S2>) -> bool {
+            js_compare(self.0.as_ref(), other.0.as_ref()) == 0
+        }
+    }
+
+    #[cfg(__unicase__iter_cmp)]
+    impl<T: AsRef<str>> Ord for Unicode<T> {
+        #[inline]
+        fn cmp(&self, other: &Self) -> Ordering {
+            match js_compare(self.0.as_ref(), other.0.as_ref()) {
+                0 => Ordering::Equal,
+                i if i < 0 => Ordering::Less,
+                i if i > 0 => Ordering::Greater,
+                _ => unreachable!()
+            }
+        }
+    }
+
+    impl<S: AsRef<str>> Hash for Unicode<S> {
+        #[inline]
+        fn hash<H: Hasher>(&self, hasher: &mut H) {
+            let mut buf = [0; 4];
+            for c in js_to_lowercase(self.0.as_ref()).chars() {
+                let len = char_to_utf8(c, &mut buf);
+                hasher.write(&buf[..len])
+            }
+        }
+    }
+
+    fn js_compare(a: &str, b: &str) -> i32 {
+        let locales = Array::new();
+        locales.push(&"en".into());
+
+        let options = Object::new();
+        Reflect::set(&options, &"sensitivity".into(), &"accent".into()).unwrap();
+
+        let a: JsString = a.into();
+        a.locale_compare(b, &locales, &options)
+    }
+
+    fn js_to_lowercase(value: &str) -> String {
+        let value: JsString = value.into();
+        let lowercase = value.to_locale_lower_case(Some("en"));
+        lowercase.into()
     }
 }
 
@@ -24,27 +117,6 @@ impl<T: AsRef<str>> PartialOrd for Unicode<T> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
-    }
-}
-
-#[cfg(__unicase__iter_cmp)]
-impl<T: AsRef<str>> Ord for Unicode<T> {
-    #[inline]
-    fn cmp(&self, other: &Self) -> Ordering {
-        let self_chars = self.0.as_ref().chars().flat_map(lookup);
-        let other_chars = other.0.as_ref().chars().flat_map(lookup);
-        self_chars.cmp(other_chars)
-    }
-}
-
-impl<S: AsRef<str>> Hash for Unicode<S> {
-    #[inline]
-    fn hash<H: Hasher>(&self, hasher: &mut H) {
-        let mut buf = [0; 4];
-        for c in self.0.as_ref().chars().flat_map(|c| lookup(c)) {
-            let len = char_to_utf8(c, &mut buf);
-            hasher.write(&buf[..len])
-        }
     }
 }
 

@@ -15,6 +15,9 @@ exclude = [
 
 build = "build.rs"
 
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+js-sys = "0.3.22"
+
 [build-dependencies]
 version_check = "0.1"
 
