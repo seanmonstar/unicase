@@ -72,11 +72,15 @@ mod wasm {
     impl<T: AsRef<str>> Ord for Unicode<T> {
         #[inline]
         fn cmp(&self, other: &Self) -> Ordering {
-            match js_compare(self.0.as_ref(), other.0.as_ref()) {
-                0 => Ordering::Equal,
-                i if i < 0 => Ordering::Less,
-                i if i > 0 => Ordering::Greater,
-                _ => unreachable!()
+            let cmp = js_compare(self.0.as_ref(), other.0.as_ref());
+            if cmp == 0 {
+                Ordering::Equal
+            }
+            else if cmp < 0 {
+                Ordering::Less
+            }
+            else {
+                Ordering::Greater
             }
         }
     }
