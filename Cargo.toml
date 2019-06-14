@@ -16,10 +16,13 @@ exclude = [
 build = "build.rs"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-js-sys = "0.3.22"
+js-sys = { version = "0.3.22", optional = true }
 
 [build-dependencies]
 version_check = "0.1"
 
 [features]
+# When compiling for WASM, by default this library uses JS string comparisons to reduce size.
+# If you want to use pure-Rust string comparisons instead you can disable this feature.
+default = ["js-sys"]
 nightly = []

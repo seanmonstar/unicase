@@ -45,7 +45,7 @@
 #[cfg(feature = "nightly")]
 extern crate test;
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(target_arch = "wasm32", feature = "js-sys"))]
 extern crate js_sys;
 
 use std::borrow::Cow;

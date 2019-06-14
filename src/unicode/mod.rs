@@ -1,6 +1,6 @@
 // On WASM targets, this includes a very large function, so on WASM we don't include it and use
 // js-sys's JsString bindings instead.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(all(target_arch = "wasm32", feature = "js-sys")))]
 mod map;
 
 #[cfg(__unicase__iter_cmp)]
@@ -9,7 +9,7 @@ use std::cmp::Ordering;
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Unicode<S>(pub S);
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(all(target_arch = "wasm32", feature = "js-sys")))]
 mod default {
     #[cfg(__unicase__iter_cmp)]
     use std::cmp::Ordering;
@@ -50,7 +50,7 @@ mod default {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(target_arch = "wasm32", feature = "js-sys"))]
 mod wasm {
     #[cfg(__unicase__iter_cmp)]
     use std::cmp::Ordering;
