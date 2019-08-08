@@ -12,4 +12,8 @@ fn main() {
     if rustc::is_min_version("1.31.0").map(|(is_min, _)| is_min).unwrap_or(true) {
         println!("cargo:rustc-cfg=__unicase__const_fns");
     }
+
+    if rustc::is_min_version("1.36.0").map(|(is_min, _)| is_min).unwrap_or(true) {
+        println!("cargo:rustc-cfg=__unicase__core_and_alloc");
+    }
 }
