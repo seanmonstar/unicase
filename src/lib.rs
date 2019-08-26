@@ -6,7 +6,6 @@
     all(
         __unicase__core_and_alloc,
         not(test),
-        not(feature = "std"),
     ),
     no_std,
 )]
@@ -53,14 +52,14 @@
 #[cfg(feature = "nightly")]
 extern crate test;
 
-#[cfg(all(__unicase__core_and_alloc, not(test), not(feature = "std")))]
+#[cfg(all(__unicase__core_and_alloc, not(test)))]
 extern crate alloc;
-#[cfg(all(__unicase__core_and_alloc, not(test), not(feature = "std")))]
+#[cfg(all(__unicase__core_and_alloc, not(test)))]
 use alloc::string::String;
 
-#[cfg(not(all(__unicase__core_and_alloc, not(test), not(feature = "std"))))]
+#[cfg(not(all(__unicase__core_and_alloc, not(test))))]
 extern crate std as alloc;
-#[cfg(not(all(__unicase__core_and_alloc, not(test), not(feature = "std"))))]
+#[cfg(not(all(__unicase__core_and_alloc, not(test))))]
 extern crate std as core;
 
 use alloc::borrow::Cow;

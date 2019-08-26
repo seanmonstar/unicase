@@ -21,6 +21,4 @@ build = "build.rs"
 version_check = "0.1"
 
 [features]
-default = ["std"]
-std = []
 nightly = []

@@ -13,7 +13,6 @@ matrix:
         - rust: 1.31.0
         # verify `no_std`
         - rust: 1.36.0
-          env: FEATURES="--no-default-features"
 
 cache:
     apt: true
