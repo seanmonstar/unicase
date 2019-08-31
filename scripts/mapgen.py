@@ -73,26 +73,33 @@ class Run:
             
         return False
 
+    # When dumping ranges, we avoid using range literals to maintain compatibility with old rustcs
     def dump(self, match_on_low_byte = False):
         def format_range_edge(x):
             if match_on_low_byte:
                 return '0x%02x' % (x&0xff)
             else:
                 return '0x%04x' % x
+        def remove_useless_comparison(case_line):
+            case_line = case_line.replace("0x00 <= x && ", "")
+            if match_on_low_byte:
+                case_line = case_line.replace(" && x <= 0xff", "")
+            return case_line
+
         if self.start == self.end:
             if len(self.map_tos)==1:
                 rs.write("            %s => 0x%04x,\n" % (format_range_edge(self.start), self.map_tos[0]))
             else:
                 rs.write("            %s => return %s,\n" % (format_range_edge(self.start), replacement(self.map_tos)))
         elif self.every_other != True:
-            rs.write("            %s ..= %s  => from.%s,\n" % (format_range_edge(self.start), format_range_edge(self.end), apply_constant_offset(self.start, self.map_tos[0])))
+            rs.write(remove_useless_comparison("            x @ _ if %s <= x && x <= %s  => from.%s,\n" % (format_range_edge(self.start), format_range_edge(self.end), apply_constant_offset(self.start, self.map_tos[0]))),)
         elif self.map_tos[0] - self.start == 1 and self.start%2==0:
-            rs.write("            %s ..= %s  => (from | 1),\n" % (format_range_edge(self.start), format_range_edge(self.end)))
+            rs.write(remove_useless_comparison("            x @ _ if %s <= x && x <= %s  => (from | 1),\n" % (format_range_edge(self.start), format_range_edge(self.end))))
         elif self.map_tos[0] - self.start == 1 and self.start%2==1:
-            rs.write("            %s ..= %s  => ((from+1) & !1),\n" % (format_range_edge(self.start), format_range_edge(self.end)))
+            rs.write(remove_useless_comparison("            x @ _ if %s <= x && x <= %s  => ((from+1) & !1),\n" % (format_range_edge(self.start), format_range_edge(self.end))))
         else:
-            rs.write("            %s ..= %s  => if (from & 1) == %s { from.%s } else { from },\n" % (format_range_edge(self.start), format_range_edge(self.end), self.start%2, apply_constant_offset(self.start, self.map_tos[0])))
-            
+            rs.write(remove_useless_comparison("            x @ _ if %s <= x && x <= %s  => if (from & 1) == %s { from.%s } else { from },\n" % (format_range_edge(self.start), format_range_edge(self.end), self.start%2, apply_constant_offset(self.start, self.map_tos[0]))))
+
 runs = []
 singlet_runs = [] # for test generation
 
@@ -186,9 +193,11 @@ rs.write('    }\n')
 rs.write('    \n')
 rs.write('    for c_index in 0..%d {\n' % test_max)
 rs.write('        if let Some(c) = char::from_u32(c_index) {\n');
-rs.write('            let reference: Vec<char> = lookup_naive(c).collect();')
-rs.write('            let actual: Vec<char> = lookup(c).collect();')
-rs.write('            assert_eq!(reference, actual, "case-folding {:?} (#0x{:04x})", c, c_index);\n')
+rs.write('            let reference: Vec<char> = lookup_naive(c).collect();\n')
+rs.write('            let actual: Vec<char> = lookup(c).collect();\n')
+rs.write('            if actual != reference {\n')
+rs.write('                assert!(false, "case-folding {:?} (#0x{:04x}) failed: Expected {:?}, got {:?}", c, c_index, reference, actual);\n')
+rs.write('            }\n')
 rs.write('        }\n')
 rs.write('    }\n')
 rs.write('}\n');
