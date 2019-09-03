@@ -9,7 +9,7 @@ documentation = "https://docs.rs/unicase"
 license = "MIT/Apache-2.0"
 readme = "README.md"
 keywords = ["lowercase", "case", "case-insensitive", "case-folding"]
-categories = ["internationalizaton", "text-processing"]
+categories = ["internationalization", "text-processing"]
 
 exclude = [
     "scripts/*"
