@@ -42,6 +42,8 @@
 //! assert_eq!(a, b);
 //! ```
 
+#[forbid(unsafe_code)]
+
 #[cfg(feature = "nightly")]
 extern crate test;
 
