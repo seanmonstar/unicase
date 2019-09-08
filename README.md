@@ -1,6 +1,6 @@
 # unicase
 
-[![Build Status](https://travis-ci.org/seanmonstar/unicase.svg?branch=master)](https://travis-ci.org/seanmonstar/unicase) [![Safety Dance](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
+[![Build Status](https://travis-ci.org/seanmonstar/unicase.svg?branch=master)](https://travis-ci.org/seanmonstar/unicase) [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 
 [Documentation](https://docs.rs/unicase)
 
