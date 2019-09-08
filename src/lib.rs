@@ -2,6 +2,7 @@
 #![cfg_attr(test, deny(warnings))]
 #![doc(html_root_url = "https://docs.rs/unicase/2.5.1")]
 #![cfg_attr(feature = "nightly", feature(test))]
+#![forbid(unsafe_code)]
 
 //! # UniCase
 //!
@@ -41,8 +42,6 @@
 //!
 //! assert_eq!(a, b);
 //! ```
-
-#[forbid(unsafe_code)]
 
 #[cfg(feature = "nightly")]
 extern crate test;
