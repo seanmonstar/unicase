@@ -360,7 +360,9 @@ mod tests {
         let c = UniCase::ascii("FoObAr");
 
         assert_eq!(a, b);
+        assert_eq!(b, a);
         assert_eq!(a, c);
+        assert_eq!(c, a);
         assert_eq!(hash(&a), hash(&b));
         assert_eq!(hash(&a), hash(&c));
         assert!(a.is_ascii());
@@ -368,12 +370,24 @@ mod tests {
         assert!(c.is_ascii());
     }
 
+
     #[test]
     fn test_eq_unicode() {
         let a = UniCase::new("στιγμας");
         let b = UniCase::new("στιγμασ");
         assert_eq!(a, b);
+        assert_eq!(b, a);
         assert_eq!(hash(&a), hash(&b));
+    }
+
+    #[test]
+    fn test_eq_unicode_left_is_substring() {
+        // https://github.com/seanmonstar/unicase/issues/38
+        let a = UniCase::unicode("foo");
+        let b = UniCase::unicode("foobar");
+
+        assert!(a != b);
+        assert!(b != a);
     }
 
     #[cfg(feature = "nightly")]
