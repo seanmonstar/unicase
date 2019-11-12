@@ -1,6 +1,6 @@
 #![cfg_attr(test, deny(missing_docs))]
 #![cfg_attr(test, deny(warnings))]
-#![doc(html_root_url = "https://docs.rs/unicase/2.5.1")]
+#![doc(html_root_url = "https://docs.rs/unicase/2.6.0")]
 #![cfg_attr(feature = "nightly", feature(test))]
 #![cfg_attr(
     all(
