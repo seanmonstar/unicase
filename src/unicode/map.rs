@@ -3,7 +3,7 @@
 
 use super::fold::Fold;
 
-use std::char;
+use core::char;
 pub fn lookup(orig: char) -> Fold {
     // The code below is is intended to reduce the binary size from that of a simple 1:1 lookup table.
     // It exploits two facts:

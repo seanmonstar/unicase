@@ -1,6 +1,6 @@
 #[cfg(__unicase__iter_cmp)]
-use std::cmp::Ordering;
-use std::hash::{Hash, Hasher};
+use core::cmp::Ordering;
+use core::hash::{Hash, Hasher};
 
 use self::map::lookup;
 mod map;

@@ -11,6 +11,11 @@ matrix:
         - rust: 1.3.0
         # verify `const fn`
         - rust: 1.31.0
+        # verify `no_std`
+        - rust: stable
+          script:
+            - rustup target add thumbv6m-none-eabi
+            - cargo build --target thumbv6m-none-eabi
 
 cache:
     apt: true
