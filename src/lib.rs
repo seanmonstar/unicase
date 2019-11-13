@@ -4,7 +4,7 @@
 #![cfg_attr(feature = "nightly", feature(test))]
 #![cfg_attr(
     all(
-        __unicase__core_and_alloc,
+        has_alloc,
         not(test),
     ),
     no_std,
@@ -52,18 +52,18 @@
 #[cfg(feature = "nightly")]
 extern crate test;
 
-#[cfg(all(__unicase__core_and_alloc, not(test)))]
+#[cfg(all(has_alloc, not(test)))]
 extern crate alloc;
-#[cfg(all(__unicase__core_and_alloc, not(test)))]
+#[cfg(all(has_alloc, not(test)))]
 use alloc::string::String;
 
-#[cfg(not(all(__unicase__core_and_alloc, not(test))))]
+#[cfg(not(all(has_alloc, not(test))))]
 extern crate std as alloc;
-#[cfg(not(all(__unicase__core_and_alloc, not(test))))]
+#[cfg(not(all(has_alloc, not(test))))]
 extern crate std as core;
 
 use alloc::borrow::Cow;
-#[cfg(__unicase__iter_cmp)]
+#[cfg(has_core__iter__Iterator__cmp)]
 use core::cmp::Ordering;
 use core::fmt;
 use core::hash::{Hash, Hasher};
@@ -135,7 +135,7 @@ impl<S: AsRef<str>> UniCase<S> {
     ///
     /// Note: This scans the text to determine if it is all ASCII or not.
     pub fn new(s: S) -> UniCase<S> {
-        #[cfg(not(__unicase__core_and_alloc))]
+        #[cfg(not(has_alloc))]
         #[allow(deprecated, unused)]
         use std::ascii::AsciiExt;
 
@@ -149,7 +149,7 @@ impl<S: AsRef<str>> UniCase<S> {
 
 impl<S> UniCase<S> {
     /// Creates a new `UniCase`, skipping the ASCII check.
-    #[cfg(__unicase__const_fns)]
+    #[cfg(rustc_1_31)]
     pub const fn unicode(s: S) -> UniCase<S> {
         UniCase(Encoding::Unicode(Unicode(s)))
     }
@@ -157,13 +157,13 @@ impl<S> UniCase<S> {
     /// Creates a new `UniCase`, skipping the ASCII check.
     ///
     /// For Rust versions >= 1.31, this is a `const fn`.
-    #[cfg(not(__unicase__const_fns))]
+    #[cfg(not(rustc_1_31))]
     pub fn unicode(s: S) -> UniCase<S> {
         UniCase(Encoding::Unicode(Unicode(s)))
     }
 
     /// Creates a new `UniCase` which performs only ASCII case folding.
-    #[cfg(__unicase__const_fns)]
+    #[cfg(rustc_1_31)]
     pub const fn ascii(s: S) -> UniCase<S> {
         UniCase(Encoding::Ascii(Ascii(s)))
     }
@@ -171,7 +171,7 @@ impl<S> UniCase<S> {
     /// Creates a new `UniCase` which performs only ASCII case folding.
     ///
     /// For Rust versions >= 1.31, this is a `const fn`.
-    #[cfg(not(__unicase__const_fns))]
+    #[cfg(not(rustc_1_31))]
     pub fn ascii(s: S) -> UniCase<S> {
         UniCase(Encoding::Ascii(Ascii(s)))
     }
@@ -299,7 +299,7 @@ into_impl!(&'a str);
 into_impl!(String);
 into_impl!(Cow<'a, str>);
 
-#[cfg(__unicase__iter_cmp)]
+#[cfg(has_core__iter__Iterator__cmp)]
 impl<T: AsRef<str>> PartialOrd for UniCase<T> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -307,7 +307,7 @@ impl<T: AsRef<str>> PartialOrd for UniCase<T> {
     }
 }
 
-#[cfg(__unicase__iter_cmp)]
+#[cfg(has_core__iter__Iterator__cmp)]
 impl<T: AsRef<str>> Ord for UniCase<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
@@ -333,9 +333,9 @@ impl<S: FromStr + AsRef<str>> FromStr for UniCase<S> {
 mod tests {
     use super::UniCase;
     use std::hash::{Hash, Hasher};
-    #[cfg(not(__unicase__default_hasher))]
+    #[cfg(not(has_std__collections__hash_map__DefaultHasher))]
     use std::hash::SipHasher as DefaultHasher;
-    #[cfg(__unicase__default_hasher)]
+    #[cfg(has_std__collections__hash_map__DefaultHasher)]
     use std::collections::hash_map::DefaultHasher;
 
     fn hash<T: Hash>(t: &T) -> u64 {
@@ -422,7 +422,7 @@ mod tests {
         b.iter(|| assert!(::std::str::from_utf8(SUBJECT).is_ok()));
     }
 
-    #[cfg(__unicase__iter_cmp)]
+    #[cfg(has_core__iter__Iterator__cmp)]
     #[test]
     fn test_case_cmp() {
         assert!(UniCase::new("a") < UniCase::new("B"));
@@ -457,7 +457,7 @@ mod tests {
         let _: &str = owned.as_ref();
     }
 
-    #[cfg(__unicase__const_fns)]
+    #[cfg(rustc_1_31)]
     #[test]
     fn test_unicase_unicode_const() {
         const _UNICASE: UniCase<&'static str> = UniCase::unicode("");

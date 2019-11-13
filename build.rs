@@ -5,19 +5,11 @@ fn main() {
 
     let ac = autocfg::new();
 
-    if ac.probe_rustc_version(1, 5) {
-        autocfg::emit("__unicase__iter_cmp");
-    }
+    ac.emit_has_path("core::iter::Iterator::cmp");
+    ac.emit_has_type("std::collections::hash_map::DefaultHasher");
 
-    if ac.probe_rustc_version(1, 13) {
-        autocfg::emit("__unicase__default_hasher");
-    }
+    // For `const fn` support
+    ac.emit_rustc_version(1, 31);
 
-    if ac.probe_rustc_version(1, 31) {
-        autocfg::emit("__unicase__const_fns");
-    }
-
-    if ac.probe_rustc_version(1, 36) {
-        autocfg::emit("__unicase__core_and_alloc");
-    }
+    ac.emit_sysroot_crate("alloc");
 }

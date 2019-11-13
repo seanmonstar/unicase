@@ -1,11 +1,11 @@
 use alloc::string::String;
-#[cfg(__unicase__iter_cmp)]
+#[cfg(has_core__iter__Iterator__cmp)]
 use core::cmp::Ordering;
 use core::fmt;
 use core::hash::{Hash, Hasher};
 use core::ops::{Deref, DerefMut};
 use core::str::FromStr;
-#[cfg(not(__unicase__core_and_alloc))]
+#[cfg(not(has_alloc))]
 #[allow(deprecated, unused)]
 use std::ascii::AsciiExt;
 
@@ -13,7 +13,7 @@ use super::{Ascii, Encoding, UniCase};
 
 impl<S> Ascii<S> {
     #[inline]
-    #[cfg(__unicase__const_fns)]
+    #[cfg(rustc_1_31)]
     pub const fn new(s: S) -> Ascii<S> {
         Ascii(s)
     }
@@ -22,7 +22,7 @@ impl<S> Ascii<S> {
     ///
     /// For Rust versions >= 1.31, this is a `const fn`.
     #[inline]
-    #[cfg(not(__unicase__const_fns))]
+    #[cfg(not(rustc_1_31))]
     pub fn new(s: S) -> Ascii<S> {
         Ascii(s)
     }
@@ -58,7 +58,7 @@ impl<S> DerefMut for Ascii<S> {
     }
 }
 
-#[cfg(__unicase__iter_cmp)]
+#[cfg(has_core__iter__Iterator__cmp)]
 impl<T: AsRef<str>> PartialOrd for Ascii<T> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -66,7 +66,7 @@ impl<T: AsRef<str>> PartialOrd for Ascii<T> {
     }
 }
 
-#[cfg(__unicase__iter_cmp)]
+#[cfg(has_core__iter__Iterator__cmp)]
 impl<T: AsRef<str>> Ord for Ascii<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
@@ -134,9 +134,9 @@ impl<S: AsRef<str>> Hash for Ascii<S> {
 mod tests {
     use ::Ascii;
     use std::hash::{Hash, Hasher};
-    #[cfg(not(__unicase__default_hasher))]
+    #[cfg(not(has_std__collections__hash_map__DefaultHasher))]
     use std::hash::SipHasher as DefaultHasher;
-    #[cfg(__unicase__default_hasher)]
+    #[cfg(has_std__collections__hash_map__DefaultHasher)]
     use std::collections::hash_map::DefaultHasher;
 
     fn hash<T: Hash>(t: &T) -> u64 {
@@ -166,7 +166,7 @@ mod tests {
         b.iter(|| assert_eq!(Ascii("foobar"), Ascii("FOOBAR")));
     }
 
-    #[cfg(__unicase__iter_cmp)]
+    #[cfg(has_core__iter__Iterator__cmp)]
     #[test]
     fn test_case_cmp() {
         assert!(Ascii("foobar") == Ascii("FOOBAR"));
@@ -179,7 +179,7 @@ mod tests {
         assert!(Ascii("a") < Ascii("AA"));
     }
 
-    #[cfg(__unicase__const_fns)]
+    #[cfg(rustc_1_31)]
     #[test]
     fn test_ascii_new_const() {
         const _ASCII: Ascii<&'static str> = Ascii::new("");
