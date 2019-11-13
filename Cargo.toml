@@ -18,7 +18,7 @@ exclude = [
 build = "build.rs"
 
 [build-dependencies]
-version_check = "0.9"
+autocfg = "0.1"
 
 [features]
 nightly = []

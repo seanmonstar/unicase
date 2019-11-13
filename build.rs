@@ -1,23 +1,15 @@
-extern crate version_check as rustc;
+extern crate autocfg;
 
 fn main() {
-    if is_rustc_at_least("1.5.0") {
-        println!("cargo:rustc-cfg=__unicase__iter_cmp");
-    }
+    autocfg::rerun_path(file!());
 
-    if is_rustc_at_least("1.13.0") {
-        println!("cargo:rustc-cfg=__unicase__default_hasher");
-    }
+    let ac = autocfg::new();
 
-    if is_rustc_at_least("1.31.0") {
-        println!("cargo:rustc-cfg=__unicase__const_fns");
-    }
+    ac.emit_has_path("core::iter::Iterator::cmp");
+    ac.emit_has_type("std::collections::hash_map::DefaultHasher");
 
-    if is_rustc_at_least("1.36.0") {
-        println!("cargo:rustc-cfg=__unicase__core_and_alloc");
-    }
-}
+    // For `const fn` support
+    ac.emit_rustc_version(1, 31);
 
-fn is_rustc_at_least(v: &str) -> bool {
-    rustc::is_min_version(v).unwrap_or(true)
+    ac.emit_sysroot_crate("alloc");
 }
