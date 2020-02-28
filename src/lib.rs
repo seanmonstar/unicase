@@ -74,6 +74,7 @@ use self::unicode::Unicode;
 
 mod ascii;
 mod unicode;
+pub mod serde;
 
 /// Case Insensitive wrapper of strings.
 #[derive(Clone, Copy)]
