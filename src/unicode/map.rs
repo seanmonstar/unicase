@@ -488,6 +488,7 @@ pub fn lookup(orig: char) -> Fold {
 }
 
 #[test]
+#[cfg(not(miri))]
 fn lookup_consistency() {
     fn lookup_naive(orig: char) -> Fold {
         let single_char = match orig as u32 {
@@ -1993,3 +1994,6 @@ fn lookup_consistency() {
         }
     }
 }
+
+
+
