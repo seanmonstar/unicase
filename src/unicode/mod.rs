@@ -59,8 +59,9 @@ impl<S: AsRef<str>> Hash for Unicode<S> {
         let mut buf = [0; 4];
         for c in self.0.as_ref().chars().flat_map(|c| lookup(c)) {
             let len = char_to_utf8(c, &mut buf);
-            hasher.write(&buf[..len])
+            hasher.write(&buf[..len]);
         }
+        hasher.write_u8(0xff);
     }
 }
 

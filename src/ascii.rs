@@ -127,6 +127,7 @@ impl<S: AsRef<str>> Hash for Ascii<S> {
         for byte in self.as_ref().bytes().map(|b| b.to_ascii_lowercase()) {
             hasher.write_u8(byte);
         }
+        hasher.write_u8(0xff);
     }
 }
 
