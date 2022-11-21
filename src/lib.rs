@@ -253,7 +253,7 @@ impl<S> From<Ascii<S>> for UniCase<S> {
     }
 }
 
-macro_rules! from_impl {
+macro_rules! unicase_from_external_impl {
     ($from:ty => $to:ty; $by:ident) => (
         impl<'a> From<$from> for UniCase<$to> {
             fn from(s: $from) -> Self {
@@ -261,14 +261,14 @@ macro_rules! from_impl {
             }
         }
     );
-    ($from:ty => $to:ty) => ( from_impl!($from => $to; into); )
+    ($from:ty => $to:ty) => ( unicase_from_external_impl!($from => $to; into); )
 }
 
-macro_rules! into_impl {
+macro_rules! external_from_unicase_impl {
     ($to:ty) => {
-        impl<'a> Into<$to> for UniCase<$to> {
-            fn into(self) -> $to {
-                self.into_inner()
+        impl<'a> From<UniCase<$to>> for $to {
+            fn from(from: UniCase<$to>) -> $to {
+                from.into_inner()
             }
         }
     };
@@ -280,15 +280,15 @@ impl<S: AsRef<str>> From<S> for UniCase<S> {
     }
 }
 
-from_impl!(&'a str => Cow<'a, str>);
-from_impl!(String => Cow<'a, str>);
-from_impl!(&'a str => String);
-from_impl!(Cow<'a, str> => String; into_owned);
-from_impl!(&'a String => &'a str; as_ref);
+unicase_from_external_impl!(&'a str => Cow<'a, str>);
+unicase_from_external_impl!(String => Cow<'a, str>);
+unicase_from_external_impl!(&'a str => String);
+unicase_from_external_impl!(Cow<'a, str> => String; into_owned);
+unicase_from_external_impl!(&'a String => &'a str; as_ref);
 
-into_impl!(&'a str);
-into_impl!(String);
-into_impl!(Cow<'a, str>);
+external_from_unicase_impl!(&'a str);
+external_from_unicase_impl!(String);
+external_from_unicase_impl!(Cow<'a, str>);
 
 #[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> PartialOrd for UniCase<T> {
@@ -440,13 +440,23 @@ mod tests {
 
     #[test]
     fn test_into_impls() {
+        use std::borrow::Cow;
+
         let view: UniCase<&'static str> = UniCase::new("foobar");
-        let _: &'static str = view.into();
-        let _: &str = view.into();
+        let _: &'static str = view.clone().into();
+        let _: &str = view.clone().into();
+        let _: &str = view.clone().as_ref();
+        let _ = <&str>::from(view);
 
         let owned: UniCase<String> = "foobar".into();
         let _: String = owned.clone().into();
-        let _: &str = owned.as_ref();
+        let _: &str = owned.clone().as_ref();
+        let _ = String::from(owned);
+
+        let cow: UniCase<Cow<str>> = "foobar".into();
+        let _: Cow<str> = cow.clone().into();
+        let _: &str = cow.clone().as_ref();
+        let _ = Cow::from(cow);
     }
 
     #[cfg(__unicase__const_fns)]
