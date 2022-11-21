@@ -17,7 +17,7 @@ txt = open('./scripts/CaseFolding.txt')
 def replacement(chars):
     chars_len = len(chars)
     inside = ', '.join(["'\\u{%04x}'" % c for c in chars])
-    return '%s(%s,)' % (variant(chars_len), inside)
+    return '%s(%s)' % (variant(chars_len), inside)
 
 def apply_constant_offset(offset_from, offset_to):
     if offset_to < offset_from:
@@ -93,13 +93,19 @@ class Run:
             else:
                 rs.write("            %s => return %s,\n" % (format_range_edge(self.start), replacement(self.map_tos)))
         elif self.every_other != True:
-            rs.write(remove_useless_comparison("            x @ _ if %s <= x && x <= %s  => from.%s,\n" % (format_range_edge(self.start), format_range_edge(self.end), apply_constant_offset(self.start, self.map_tos[0]))),)
+            rs.write(remove_useless_comparison("            x if (%s..=%s).contains(&x) => from.%s,\n" % (format_range_edge(self.start), format_range_edge(self.end), apply_constant_offset(self.start, self.map_tos[0]))),)
         elif self.map_tos[0] - self.start == 1 and self.start%2==0:
-            rs.write(remove_useless_comparison("            x @ _ if %s <= x && x <= %s  => (from | 1),\n" % (format_range_edge(self.start), format_range_edge(self.end))))
+            rs.write(remove_useless_comparison("            x if (%s..=%s).contains(&x) => from | 1,\n" % (format_range_edge(self.start), format_range_edge(self.end))))
         elif self.map_tos[0] - self.start == 1 and self.start%2==1:
-            rs.write(remove_useless_comparison("            x @ _ if %s <= x && x <= %s  => ((from+1) & !1),\n" % (format_range_edge(self.start), format_range_edge(self.end))))
+            rs.write(remove_useless_comparison("            x if (%s..=%s).contains(&x) => (from + 1) & !1,\n" % (format_range_edge(self.start), format_range_edge(self.end))))
         else:
-            rs.write(remove_useless_comparison("            x @ _ if %s <= x && x <= %s  => if (from & 1) == %s { from.%s } else { from },\n" % (format_range_edge(self.start), format_range_edge(self.end), self.start%2, apply_constant_offset(self.start, self.map_tos[0]))))
+            rs.write("            x if (%s..=%s).contains(&x) => {\n" % (format_range_edge(self.start), format_range_edge(self.end)))
+            rs.write("                    if (from & 1) == %s {\n" % (self.start % 2))
+            rs.write("                        from.%s\n" % (apply_constant_offset(self.start, self.map_tos[0])))
+            rs.write("                    } else {\n")
+            rs.write("                        from\n")
+            rs.write("                    }\n")
+            rs.write("                }\n")
 
 runs = []
 singlet_runs = [] # for test generation
@@ -158,27 +164,26 @@ rs.write('        let high_byte = (from >> 8) as u8;\n');
 rs.write('        let low_byte = (from & 0xff) as u8;\n');
 rs.write('        let single_char: u16 = match high_byte {\n')
 for (high_byte, runs) in enumerate(small_run_chunks):
-    rs.write("            0x%02x => {\n" % high_byte);
+    rs.write("            0x%02x => " % high_byte);
     if len(runs)==0:
-        rs.write('                from\n')
+        rs.write('from,\n')
     else:
-        rs.write("                match low_byte {\n")
+        rs.write("match low_byte {\n")
         for r in runs:
-            rs.write('        ')
+            rs.write('    ')
             r.dump(match_on_low_byte = True)
-        rs.write("                    _ => from\n")
-        rs.write("                }\n");
-    rs.write("            }\n")
-rs.write('            _ => from \n')
+        rs.write("                _ => from,\n")
+        rs.write("            },\n");
+rs.write('            _ => from,\n')
 rs.write('        };\n');
-rs.write('        Fold::One( char::from_u32(single_char as u32).unwrap_or(orig) )\n')
+rs.write('        Fold::One(char::from_u32(single_char as u32).unwrap_or(orig))\n')
 rs.write('    } else {\n');
 rs.write('        let single_char: u32 = match from {\n')
 for r in high_runs:
     r.dump()
-rs.write('            _ => from\n')
+rs.write('            _ => from,\n')
 rs.write('        };\n')
-rs.write('        Fold::One( char::from_u32(single_char).unwrap_or(orig) )\n')
+rs.write('        Fold::One(char::from_u32(single_char).unwrap_or(orig))\n')
 rs.write('    }\n')
 rs.write('}\n')
 
@@ -192,17 +197,20 @@ rs.write('    fn lookup_naive(orig: char) -> Fold {\n')
 rs.write('        let single_char = match orig as u32 {\n');
 for r in singlet_runs:
     r.dump()
-rs.write('            _ => orig as u32\n')
+rs.write('            _ => orig as u32,\n')
 rs.write('        };\n')
-rs.write('        Fold::One( char::from_u32(single_char).unwrap() )\n')
-rs.write('    }\n')
-rs.write('    \n')
+rs.write('        Fold::One(char::from_u32(single_char).unwrap())\n')
+rs.write('    }\n\n')
 rs.write('    for c_index in 0..%d {\n' % test_max)
 rs.write('        if let Some(c) = char::from_u32(c_index) {\n');
 rs.write('            let reference: Vec<char> = lookup_naive(c).collect();\n')
 rs.write('            let actual: Vec<char> = lookup(c).collect();\n')
 rs.write('            if actual != reference {\n')
-rs.write('                assert!(false, "case-folding {:?} (#0x{:04x}) failed: Expected {:?}, got {:?}", c, c_index, reference, actual);\n')
+rs.write('                assert!(\n')
+rs.write('                    false,\n')
+rs.write('                    "case-folding {:?} (#0x{:04x}) failed: Expected {:?}, got {:?}",\n')
+rs.write('                    c, c_index, reference, actual,\n')
+rs.write('                );\n')
 rs.write('            }\n')
 rs.write('        }\n')
 rs.write('    }\n')
