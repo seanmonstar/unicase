@@ -104,7 +104,7 @@ runs = []
 singlet_runs = [] # for test generation
 
 for line in txt.readlines():
-    if line[0] is not '#':
+    if line[0] != '#':
         parts = line.split('; ')
         if len(parts) > 2 and parts[1] in 'CF':
             map_from = int(parts[0], 16)
