@@ -81,7 +81,6 @@ impl<S: AsRef<str>> AsRef<str> for Ascii<S> {
     fn as_ref(&self) -> &str {
         self.0.as_ref()
     }
-
 }
 
 impl<S: fmt::Display> fmt::Display for Ascii<S> {
@@ -132,12 +131,12 @@ impl<S: AsRef<str>> Hash for Ascii<S> {
 
 #[cfg(test)]
 mod tests {
-    use ::Ascii;
-    use std::hash::{Hash, Hasher};
-    #[cfg(not(__unicase__default_hasher))]
-    use std::hash::SipHasher as DefaultHasher;
     #[cfg(__unicase__default_hasher)]
     use std::collections::hash_map::DefaultHasher;
+    #[cfg(not(__unicase__default_hasher))]
+    use std::hash::SipHasher as DefaultHasher;
+    use std::hash::{Hash, Hasher};
+    use Ascii;
 
     fn hash<T: Hash>(t: &T) -> u64 {
         let mut s = DefaultHasher::new();

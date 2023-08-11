@@ -66,10 +66,10 @@ impl<S: AsRef<str>> Hash for Unicode<S> {
 
 #[inline]
 fn char_to_utf8(c: char, dst: &mut [u8; 4]) -> usize {
-    const TAG_CONT: u8    = 0b1000_0000;
-    const TAG_TWO_B: u8   = 0b1100_0000;
+    const TAG_CONT: u8 = 0b1000_0000;
+    const TAG_TWO_B: u8 = 0b1100_0000;
     const TAG_THREE_B: u8 = 0b1110_0000;
-    const TAG_FOUR_B: u8  = 0b1111_0000;
+    const TAG_FOUR_B: u8 = 0b1111_0000;
 
     let code = c as u32;
     if code <= 0x7F {
@@ -81,13 +81,13 @@ fn char_to_utf8(c: char, dst: &mut [u8; 4]) -> usize {
         2
     } else if code <= 0xFFFF {
         dst[0] = (code >> 12 & 0x0F) as u8 | TAG_THREE_B;
-        dst[1] = (code >>  6 & 0x3F) as u8 | TAG_CONT;
+        dst[1] = (code >> 6 & 0x3F) as u8 | TAG_CONT;
         dst[2] = (code & 0x3F) as u8 | TAG_CONT;
         3
     } else {
         dst[0] = (code >> 18 & 0x07) as u8 | TAG_FOUR_B;
         dst[1] = (code >> 12 & 0x3F) as u8 | TAG_CONT;
-        dst[2] = (code >>  6 & 0x3F) as u8 | TAG_CONT;
+        dst[2] = (code >> 6 & 0x3F) as u8 | TAG_CONT;
         dst[3] = (code & 0x3F) as u8 | TAG_CONT;
         4
     }
@@ -113,11 +113,11 @@ mod fold {
                 Fold::One(one) => {
                     *self = Fold::Zero;
                     Some(one)
-                },
+                }
                 Fold::Two(one, two) => {
                     *self = Fold::One(two);
                     Some(one)
-                },
+                }
                 Fold::Three(one, two, three) => {
                     *self = Fold::Two(one, two);
                     Some(three)
@@ -131,10 +131,9 @@ mod fold {
                 Fold::Zero => (0, Some(0)),
                 Fold::One(..) => (1, Some(1)),
                 Fold::Two(..) => (2, Some(2)),
-                Fold::Three(..) => (3, Some(3))
+                Fold::Three(..) => (3, Some(3)),
             }
         }
-
     }
     impl From<(char,)> for Fold {
         #[inline]
@@ -163,9 +162,9 @@ mod tests {
     use super::Unicode;
 
     macro_rules! eq {
-        ($left:expr, $right:expr) => ({
+        ($left:expr, $right:expr) => {{
             assert_eq!(Unicode($left), Unicode($right));
-        });
+        }};
     }
 
     #[test]
