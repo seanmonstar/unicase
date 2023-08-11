@@ -19,434 +19,350 @@ pub fn lookup(orig: char) -> Fold {
         let high_byte = (from >> 8) as u8;
         let low_byte = (from & 0xff) as u8;
         let single_char: u16 = match high_byte {
-            0x00 => {
-                match low_byte {
-                    x @ _ if 0x41 <= x && x <= 0x5a  => from.wrapping_add(0x0020),
-                    0xb5 => 0x03bc,
-                    x @ _ if 0xc0 <= x && x <= 0xd6  => from.wrapping_add(0x0020),
-                    x @ _ if 0xd8 <= x && x <= 0xde  => from.wrapping_add(0x0020),
-                    0xdf => return Fold::Two('\u{0073}', '\u{0073}',),
-                    _ => from
+            0x00 => match low_byte {
+                x @ _ if 0x41 <= x && x <= 0x5a => from.wrapping_add(0x0020),
+                0xb5 => 0x03bc,
+                x @ _ if 0xc0 <= x && x <= 0xd6 => from.wrapping_add(0x0020),
+                x @ _ if 0xd8 <= x && x <= 0xde => from.wrapping_add(0x0020),
+                0xdf => return Fold::Two('\u{0073}', '\u{0073}'),
+                _ => from,
+            },
+            0x01 => match low_byte {
+                x @ _ if x <= 0x2e => (from | 1),
+                0x30 => return Fold::Two('\u{0069}', '\u{0307}'),
+                x @ _ if 0x32 <= x && x <= 0x36 => (from | 1),
+                x @ _ if 0x39 <= x && x <= 0x47 => ((from + 1) & !1),
+                0x49 => return Fold::Two('\u{02bc}', '\u{006e}'),
+                x @ _ if 0x4a <= x && x <= 0x76 => (from | 1),
+                0x78 => 0x00ff,
+                x @ _ if 0x79 <= x && x <= 0x7d => ((from + 1) & !1),
+                0x7f => 0x0073,
+                0x81 => 0x0253,
+                x @ _ if 0x82 <= x && x <= 0x84 => (from | 1),
+                0x86 => 0x0254,
+                0x87 => 0x0188,
+                x @ _ if 0x89 <= x && x <= 0x8a => from.wrapping_add(0x00cd),
+                0x8b => 0x018c,
+                0x8e => 0x01dd,
+                0x8f => 0x0259,
+                0x90 => 0x025b,
+                0x91 => 0x0192,
+                0x93 => 0x0260,
+                0x94 => 0x0263,
+                0x96 => 0x0269,
+                0x97 => 0x0268,
+                0x98 => 0x0199,
+                0x9c => 0x026f,
+                0x9d => 0x0272,
+                0x9f => 0x0275,
+                x @ _ if 0xa0 <= x && x <= 0xa4 => (from | 1),
+                0xa6 => 0x0280,
+                0xa7 => 0x01a8,
+                0xa9 => 0x0283,
+                0xac => 0x01ad,
+                0xae => 0x0288,
+                0xaf => 0x01b0,
+                x @ _ if 0xb1 <= x && x <= 0xb2 => from.wrapping_add(0x00d9),
+                x @ _ if 0xb3 <= x && x <= 0xb5 => ((from + 1) & !1),
+                0xb7 => 0x0292,
+                0xb8 => 0x01b9,
+                0xbc => 0x01bd,
+                0xc4 => 0x01c6,
+                0xc5 => 0x01c6,
+                0xc7 => 0x01c9,
+                0xc8 => 0x01c9,
+                0xca => 0x01cc,
+                x @ _ if 0xcb <= x && x <= 0xdb => ((from + 1) & !1),
+                x @ _ if 0xde <= x && x <= 0xee => (from | 1),
+                0xf0 => return Fold::Two('\u{006a}', '\u{030c}'),
+                0xf1 => 0x01f3,
+                x @ _ if 0xf2 <= x && x <= 0xf4 => (from | 1),
+                0xf6 => 0x0195,
+                0xf7 => 0x01bf,
+                x @ _ if 0xf8 <= x => (from | 1),
+                _ => from,
+            },
+            0x02 => match low_byte {
+                x @ _ if x <= 0x1e => (from | 1),
+                0x20 => 0x019e,
+                x @ _ if 0x22 <= x && x <= 0x32 => (from | 1),
+                0x3a => 0x2c65,
+                0x3b => 0x023c,
+                0x3d => 0x019a,
+                0x3e => 0x2c66,
+                0x41 => 0x0242,
+                0x43 => 0x0180,
+                0x44 => 0x0289,
+                0x45 => 0x028c,
+                x @ _ if 0x46 <= x && x <= 0x4e => (from | 1),
+                _ => from,
+            },
+            0x03 => match low_byte {
+                0x45 => 0x03b9,
+                x @ _ if 0x70 <= x && x <= 0x72 => (from | 1),
+                0x76 => 0x0377,
+                0x7f => 0x03f3,
+                0x86 => 0x03ac,
+                x @ _ if 0x88 <= x && x <= 0x8a => from.wrapping_add(0x0025),
+                0x8c => 0x03cc,
+                x @ _ if 0x8e <= x && x <= 0x8f => from.wrapping_add(0x003f),
+                0x90 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0301}'),
+                x @ _ if 0x91 <= x && x <= 0xa1 => from.wrapping_add(0x0020),
+                x @ _ if 0xa3 <= x && x <= 0xab => from.wrapping_add(0x0020),
+                0xb0 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0301}'),
+                0xc2 => 0x03c3,
+                0xcf => 0x03d7,
+                0xd0 => 0x03b2,
+                0xd1 => 0x03b8,
+                0xd5 => 0x03c6,
+                0xd6 => 0x03c0,
+                x @ _ if 0xd8 <= x && x <= 0xee => (from | 1),
+                0xf0 => 0x03ba,
+                0xf1 => 0x03c1,
+                0xf4 => 0x03b8,
+                0xf5 => 0x03b5,
+                0xf7 => 0x03f8,
+                0xf9 => 0x03f2,
+                0xfa => 0x03fb,
+                x @ _ if 0xfd <= x => from.wrapping_sub(0x0082),
+                _ => from,
+            },
+            0x04 => match low_byte {
+                x @ _ if x <= 0x0f => from.wrapping_add(0x0050),
+                x @ _ if 0x10 <= x && x <= 0x2f => from.wrapping_add(0x0020),
+                x @ _ if 0x60 <= x && x <= 0x80 => (from | 1),
+                x @ _ if 0x8a <= x && x <= 0xbe => (from | 1),
+                0xc0 => 0x04cf,
+                x @ _ if 0xc1 <= x && x <= 0xcd => ((from + 1) & !1),
+                x @ _ if 0xd0 <= x => (from | 1),
+                _ => from,
+            },
+            0x05 => match low_byte {
+                x @ _ if x <= 0x2e => (from | 1),
+                x @ _ if 0x31 <= x && x <= 0x56 => from.wrapping_add(0x0030),
+                0x87 => return Fold::Two('\u{0565}', '\u{0582}'),
+                _ => from,
+            },
+            0x06 => from,
+            0x07 => from,
+            0x08 => from,
+            0x09 => from,
+            0x0a => from,
+            0x0b => from,
+            0x0c => from,
+            0x0d => from,
+            0x0e => from,
+            0x0f => from,
+            0x10 => match low_byte {
+                x @ _ if 0xa0 <= x && x <= 0xc5 => from.wrapping_add(0x1c60),
+                0xc7 => 0x2d27,
+                0xcd => 0x2d2d,
+                _ => from,
+            },
+            0x11 => from,
+            0x12 => from,
+            0x13 => match low_byte {
+                x @ _ if 0xf8 <= x && x <= 0xfd => from.wrapping_sub(0x0008),
+                _ => from,
+            },
+            0x14 => from,
+            0x15 => from,
+            0x16 => from,
+            0x17 => from,
+            0x18 => from,
+            0x19 => from,
+            0x1a => from,
+            0x1b => from,
+            0x1c => match low_byte {
+                0x80 => 0x0432,
+                0x81 => 0x0434,
+                0x82 => 0x043e,
+                x @ _ if 0x83 <= x && x <= 0x84 => from.wrapping_sub(0x1842),
+                0x85 => 0x0442,
+                0x86 => 0x044a,
+                0x87 => 0x0463,
+                0x88 => 0xa64b,
+                x @ _ if 0x90 <= x && x <= 0xba => from.wrapping_sub(0x0bc0),
+                x @ _ if 0xbd <= x && x <= 0xbf => from.wrapping_sub(0x0bc0),
+                _ => from,
+            },
+            0x1d => from,
+            0x1e => match low_byte {
+                x @ _ if x <= 0x94 => (from | 1),
+                0x96 => return Fold::Two('\u{0068}', '\u{0331}'),
+                0x97 => return Fold::Two('\u{0074}', '\u{0308}'),
+                0x98 => return Fold::Two('\u{0077}', '\u{030a}'),
+                0x99 => return Fold::Two('\u{0079}', '\u{030a}'),
+                0x9a => return Fold::Two('\u{0061}', '\u{02be}'),
+                0x9b => 0x1e61,
+                0x9e => return Fold::Two('\u{0073}', '\u{0073}'),
+                x @ _ if 0xa0 <= x && x <= 0xfe => (from | 1),
+                _ => from,
+            },
+            0x1f => match low_byte {
+                x @ _ if 0x08 <= x && x <= 0x0f => from.wrapping_sub(0x0008),
+                x @ _ if 0x18 <= x && x <= 0x1d => from.wrapping_sub(0x0008),
+                x @ _ if 0x28 <= x && x <= 0x2f => from.wrapping_sub(0x0008),
+                x @ _ if 0x38 <= x && x <= 0x3f => from.wrapping_sub(0x0008),
+                x @ _ if 0x48 <= x && x <= 0x4d => from.wrapping_sub(0x0008),
+                0x50 => return Fold::Two('\u{03c5}', '\u{0313}'),
+                0x52 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0300}'),
+                0x54 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0301}'),
+                0x56 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0342}'),
+                x @ _ if 0x59 <= x && x <= 0x5f => {
+                    if (from & 1) == 1 {
+                        from.wrapping_sub(0x0008)
+                    } else {
+                        from
+                    }
                 }
-            }
-            0x01 => {
-                match low_byte {
-                    x @ _ if x <= 0x2e  => (from | 1),
-                    0x30 => return Fold::Two('\u{0069}', '\u{0307}',),
-                    x @ _ if 0x32 <= x && x <= 0x36  => (from | 1),
-                    x @ _ if 0x39 <= x && x <= 0x47  => ((from+1) & !1),
-                    0x49 => return Fold::Two('\u{02bc}', '\u{006e}',),
-                    x @ _ if 0x4a <= x && x <= 0x76  => (from | 1),
-                    0x78 => 0x00ff,
-                    x @ _ if 0x79 <= x && x <= 0x7d  => ((from+1) & !1),
-                    0x7f => 0x0073,
-                    0x81 => 0x0253,
-                    x @ _ if 0x82 <= x && x <= 0x84  => (from | 1),
-                    0x86 => 0x0254,
-                    0x87 => 0x0188,
-                    x @ _ if 0x89 <= x && x <= 0x8a  => from.wrapping_add(0x00cd),
-                    0x8b => 0x018c,
-                    0x8e => 0x01dd,
-                    0x8f => 0x0259,
-                    0x90 => 0x025b,
-                    0x91 => 0x0192,
-                    0x93 => 0x0260,
-                    0x94 => 0x0263,
-                    0x96 => 0x0269,
-                    0x97 => 0x0268,
-                    0x98 => 0x0199,
-                    0x9c => 0x026f,
-                    0x9d => 0x0272,
-                    0x9f => 0x0275,
-                    x @ _ if 0xa0 <= x && x <= 0xa4  => (from | 1),
-                    0xa6 => 0x0280,
-                    0xa7 => 0x01a8,
-                    0xa9 => 0x0283,
-                    0xac => 0x01ad,
-                    0xae => 0x0288,
-                    0xaf => 0x01b0,
-                    x @ _ if 0xb1 <= x && x <= 0xb2  => from.wrapping_add(0x00d9),
-                    x @ _ if 0xb3 <= x && x <= 0xb5  => ((from+1) & !1),
-                    0xb7 => 0x0292,
-                    0xb8 => 0x01b9,
-                    0xbc => 0x01bd,
-                    0xc4 => 0x01c6,
-                    0xc5 => 0x01c6,
-                    0xc7 => 0x01c9,
-                    0xc8 => 0x01c9,
-                    0xca => 0x01cc,
-                    x @ _ if 0xcb <= x && x <= 0xdb  => ((from+1) & !1),
-                    x @ _ if 0xde <= x && x <= 0xee  => (from | 1),
-                    0xf0 => return Fold::Two('\u{006a}', '\u{030c}',),
-                    0xf1 => 0x01f3,
-                    x @ _ if 0xf2 <= x && x <= 0xf4  => (from | 1),
-                    0xf6 => 0x0195,
-                    0xf7 => 0x01bf,
-                    x @ _ if 0xf8 <= x  => (from | 1),
-                    _ => from
-                }
-            }
-            0x02 => {
-                match low_byte {
-                    x @ _ if x <= 0x1e  => (from | 1),
-                    0x20 => 0x019e,
-                    x @ _ if 0x22 <= x && x <= 0x32  => (from | 1),
-                    0x3a => 0x2c65,
-                    0x3b => 0x023c,
-                    0x3d => 0x019a,
-                    0x3e => 0x2c66,
-                    0x41 => 0x0242,
-                    0x43 => 0x0180,
-                    0x44 => 0x0289,
-                    0x45 => 0x028c,
-                    x @ _ if 0x46 <= x && x <= 0x4e  => (from | 1),
-                    _ => from
-                }
-            }
-            0x03 => {
-                match low_byte {
-                    0x45 => 0x03b9,
-                    x @ _ if 0x70 <= x && x <= 0x72  => (from | 1),
-                    0x76 => 0x0377,
-                    0x7f => 0x03f3,
-                    0x86 => 0x03ac,
-                    x @ _ if 0x88 <= x && x <= 0x8a  => from.wrapping_add(0x0025),
-                    0x8c => 0x03cc,
-                    x @ _ if 0x8e <= x && x <= 0x8f  => from.wrapping_add(0x003f),
-                    0x90 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0301}',),
-                    x @ _ if 0x91 <= x && x <= 0xa1  => from.wrapping_add(0x0020),
-                    x @ _ if 0xa3 <= x && x <= 0xab  => from.wrapping_add(0x0020),
-                    0xb0 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0301}',),
-                    0xc2 => 0x03c3,
-                    0xcf => 0x03d7,
-                    0xd0 => 0x03b2,
-                    0xd1 => 0x03b8,
-                    0xd5 => 0x03c6,
-                    0xd6 => 0x03c0,
-                    x @ _ if 0xd8 <= x && x <= 0xee  => (from | 1),
-                    0xf0 => 0x03ba,
-                    0xf1 => 0x03c1,
-                    0xf4 => 0x03b8,
-                    0xf5 => 0x03b5,
-                    0xf7 => 0x03f8,
-                    0xf9 => 0x03f2,
-                    0xfa => 0x03fb,
-                    x @ _ if 0xfd <= x  => from.wrapping_sub(0x0082),
-                    _ => from
-                }
-            }
-            0x04 => {
-                match low_byte {
-                    x @ _ if x <= 0x0f  => from.wrapping_add(0x0050),
-                    x @ _ if 0x10 <= x && x <= 0x2f  => from.wrapping_add(0x0020),
-                    x @ _ if 0x60 <= x && x <= 0x80  => (from | 1),
-                    x @ _ if 0x8a <= x && x <= 0xbe  => (from | 1),
-                    0xc0 => 0x04cf,
-                    x @ _ if 0xc1 <= x && x <= 0xcd  => ((from+1) & !1),
-                    x @ _ if 0xd0 <= x  => (from | 1),
-                    _ => from
-                }
-            }
-            0x05 => {
-                match low_byte {
-                    x @ _ if x <= 0x2e  => (from | 1),
-                    x @ _ if 0x31 <= x && x <= 0x56  => from.wrapping_add(0x0030),
-                    0x87 => return Fold::Two('\u{0565}', '\u{0582}',),
-                    _ => from
-                }
-            }
-            0x06 => {
-                from
-            }
-            0x07 => {
-                from
-            }
-            0x08 => {
-                from
-            }
-            0x09 => {
-                from
-            }
-            0x0a => {
-                from
-            }
-            0x0b => {
-                from
-            }
-            0x0c => {
-                from
-            }
-            0x0d => {
-                from
-            }
-            0x0e => {
-                from
-            }
-            0x0f => {
-                from
-            }
-            0x10 => {
-                match low_byte {
-                    x @ _ if 0xa0 <= x && x <= 0xc5  => from.wrapping_add(0x1c60),
-                    0xc7 => 0x2d27,
-                    0xcd => 0x2d2d,
-                    _ => from
-                }
-            }
-            0x11 => {
-                from
-            }
-            0x12 => {
-                from
-            }
-            0x13 => {
-                match low_byte {
-                    x @ _ if 0xf8 <= x && x <= 0xfd  => from.wrapping_sub(0x0008),
-                    _ => from
-                }
-            }
-            0x14 => {
-                from
-            }
-            0x15 => {
-                from
-            }
-            0x16 => {
-                from
-            }
-            0x17 => {
-                from
-            }
-            0x18 => {
-                from
-            }
-            0x19 => {
-                from
-            }
-            0x1a => {
-                from
-            }
-            0x1b => {
-                from
-            }
-            0x1c => {
-                match low_byte {
-                    0x80 => 0x0432,
-                    0x81 => 0x0434,
-                    0x82 => 0x043e,
-                    x @ _ if 0x83 <= x && x <= 0x84  => from.wrapping_sub(0x1842),
-                    0x85 => 0x0442,
-                    0x86 => 0x044a,
-                    0x87 => 0x0463,
-                    0x88 => 0xa64b,
-                    x @ _ if 0x90 <= x && x <= 0xba  => from.wrapping_sub(0x0bc0),
-                    x @ _ if 0xbd <= x && x <= 0xbf  => from.wrapping_sub(0x0bc0),
-                    _ => from
-                }
-            }
-            0x1d => {
-                from
-            }
-            0x1e => {
-                match low_byte {
-                    x @ _ if x <= 0x94  => (from | 1),
-                    0x96 => return Fold::Two('\u{0068}', '\u{0331}',),
-                    0x97 => return Fold::Two('\u{0074}', '\u{0308}',),
-                    0x98 => return Fold::Two('\u{0077}', '\u{030a}',),
-                    0x99 => return Fold::Two('\u{0079}', '\u{030a}',),
-                    0x9a => return Fold::Two('\u{0061}', '\u{02be}',),
-                    0x9b => 0x1e61,
-                    0x9e => return Fold::Two('\u{0073}', '\u{0073}',),
-                    x @ _ if 0xa0 <= x && x <= 0xfe  => (from | 1),
-                    _ => from
-                }
-            }
-            0x1f => {
-                match low_byte {
-                    x @ _ if 0x08 <= x && x <= 0x0f  => from.wrapping_sub(0x0008),
-                    x @ _ if 0x18 <= x && x <= 0x1d  => from.wrapping_sub(0x0008),
-                    x @ _ if 0x28 <= x && x <= 0x2f  => from.wrapping_sub(0x0008),
-                    x @ _ if 0x38 <= x && x <= 0x3f  => from.wrapping_sub(0x0008),
-                    x @ _ if 0x48 <= x && x <= 0x4d  => from.wrapping_sub(0x0008),
-                    0x50 => return Fold::Two('\u{03c5}', '\u{0313}',),
-                    0x52 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0300}',),
-                    0x54 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0301}',),
-                    0x56 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0342}',),
-                    x @ _ if 0x59 <= x && x <= 0x5f  => if (from & 1) == 1 { from.wrapping_sub(0x0008) } else { from },
-                    x @ _ if 0x68 <= x && x <= 0x6f  => from.wrapping_sub(0x0008),
-                    0x80 => return Fold::Two('\u{1f00}', '\u{03b9}',),
-                    0x81 => return Fold::Two('\u{1f01}', '\u{03b9}',),
-                    0x82 => return Fold::Two('\u{1f02}', '\u{03b9}',),
-                    0x83 => return Fold::Two('\u{1f03}', '\u{03b9}',),
-                    0x84 => return Fold::Two('\u{1f04}', '\u{03b9}',),
-                    0x85 => return Fold::Two('\u{1f05}', '\u{03b9}',),
-                    0x86 => return Fold::Two('\u{1f06}', '\u{03b9}',),
-                    0x87 => return Fold::Two('\u{1f07}', '\u{03b9}',),
-                    0x88 => return Fold::Two('\u{1f00}', '\u{03b9}',),
-                    0x89 => return Fold::Two('\u{1f01}', '\u{03b9}',),
-                    0x8a => return Fold::Two('\u{1f02}', '\u{03b9}',),
-                    0x8b => return Fold::Two('\u{1f03}', '\u{03b9}',),
-                    0x8c => return Fold::Two('\u{1f04}', '\u{03b9}',),
-                    0x8d => return Fold::Two('\u{1f05}', '\u{03b9}',),
-                    0x8e => return Fold::Two('\u{1f06}', '\u{03b9}',),
-                    0x8f => return Fold::Two('\u{1f07}', '\u{03b9}',),
-                    0x90 => return Fold::Two('\u{1f20}', '\u{03b9}',),
-                    0x91 => return Fold::Two('\u{1f21}', '\u{03b9}',),
-                    0x92 => return Fold::Two('\u{1f22}', '\u{03b9}',),
-                    0x93 => return Fold::Two('\u{1f23}', '\u{03b9}',),
-                    0x94 => return Fold::Two('\u{1f24}', '\u{03b9}',),
-                    0x95 => return Fold::Two('\u{1f25}', '\u{03b9}',),
-                    0x96 => return Fold::Two('\u{1f26}', '\u{03b9}',),
-                    0x97 => return Fold::Two('\u{1f27}', '\u{03b9}',),
-                    0x98 => return Fold::Two('\u{1f20}', '\u{03b9}',),
-                    0x99 => return Fold::Two('\u{1f21}', '\u{03b9}',),
-                    0x9a => return Fold::Two('\u{1f22}', '\u{03b9}',),
-                    0x9b => return Fold::Two('\u{1f23}', '\u{03b9}',),
-                    0x9c => return Fold::Two('\u{1f24}', '\u{03b9}',),
-                    0x9d => return Fold::Two('\u{1f25}', '\u{03b9}',),
-                    0x9e => return Fold::Two('\u{1f26}', '\u{03b9}',),
-                    0x9f => return Fold::Two('\u{1f27}', '\u{03b9}',),
-                    0xa0 => return Fold::Two('\u{1f60}', '\u{03b9}',),
-                    0xa1 => return Fold::Two('\u{1f61}', '\u{03b9}',),
-                    0xa2 => return Fold::Two('\u{1f62}', '\u{03b9}',),
-                    0xa3 => return Fold::Two('\u{1f63}', '\u{03b9}',),
-                    0xa4 => return Fold::Two('\u{1f64}', '\u{03b9}',),
-                    0xa5 => return Fold::Two('\u{1f65}', '\u{03b9}',),
-                    0xa6 => return Fold::Two('\u{1f66}', '\u{03b9}',),
-                    0xa7 => return Fold::Two('\u{1f67}', '\u{03b9}',),
-                    0xa8 => return Fold::Two('\u{1f60}', '\u{03b9}',),
-                    0xa9 => return Fold::Two('\u{1f61}', '\u{03b9}',),
-                    0xaa => return Fold::Two('\u{1f62}', '\u{03b9}',),
-                    0xab => return Fold::Two('\u{1f63}', '\u{03b9}',),
-                    0xac => return Fold::Two('\u{1f64}', '\u{03b9}',),
-                    0xad => return Fold::Two('\u{1f65}', '\u{03b9}',),
-                    0xae => return Fold::Two('\u{1f66}', '\u{03b9}',),
-                    0xaf => return Fold::Two('\u{1f67}', '\u{03b9}',),
-                    0xb2 => return Fold::Two('\u{1f70}', '\u{03b9}',),
-                    0xb3 => return Fold::Two('\u{03b1}', '\u{03b9}',),
-                    0xb4 => return Fold::Two('\u{03ac}', '\u{03b9}',),
-                    0xb6 => return Fold::Two('\u{03b1}', '\u{0342}',),
-                    0xb7 => return Fold::Three('\u{03b1}', '\u{0342}', '\u{03b9}',),
-                    x @ _ if 0xb8 <= x && x <= 0xb9  => from.wrapping_sub(0x0008),
-                    x @ _ if 0xba <= x && x <= 0xbb  => from.wrapping_sub(0x004a),
-                    0xbc => return Fold::Two('\u{03b1}', '\u{03b9}',),
-                    0xbe => 0x03b9,
-                    0xc2 => return Fold::Two('\u{1f74}', '\u{03b9}',),
-                    0xc3 => return Fold::Two('\u{03b7}', '\u{03b9}',),
-                    0xc4 => return Fold::Two('\u{03ae}', '\u{03b9}',),
-                    0xc6 => return Fold::Two('\u{03b7}', '\u{0342}',),
-                    0xc7 => return Fold::Three('\u{03b7}', '\u{0342}', '\u{03b9}',),
-                    x @ _ if 0xc8 <= x && x <= 0xcb  => from.wrapping_sub(0x0056),
-                    0xcc => return Fold::Two('\u{03b7}', '\u{03b9}',),
-                    0xd2 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0300}',),
-                    0xd3 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0301}',),
-                    0xd6 => return Fold::Two('\u{03b9}', '\u{0342}',),
-                    0xd7 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0342}',),
-                    x @ _ if 0xd8 <= x && x <= 0xd9  => from.wrapping_sub(0x0008),
-                    x @ _ if 0xda <= x && x <= 0xdb  => from.wrapping_sub(0x0064),
-                    0xe2 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0300}',),
-                    0xe3 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0301}',),
-                    0xe4 => return Fold::Two('\u{03c1}', '\u{0313}',),
-                    0xe6 => return Fold::Two('\u{03c5}', '\u{0342}',),
-                    0xe7 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0342}',),
-                    x @ _ if 0xe8 <= x && x <= 0xe9  => from.wrapping_sub(0x0008),
-                    x @ _ if 0xea <= x && x <= 0xeb  => from.wrapping_sub(0x0070),
-                    0xec => 0x1fe5,
-                    0xf2 => return Fold::Two('\u{1f7c}', '\u{03b9}',),
-                    0xf3 => return Fold::Two('\u{03c9}', '\u{03b9}',),
-                    0xf4 => return Fold::Two('\u{03ce}', '\u{03b9}',),
-                    0xf6 => return Fold::Two('\u{03c9}', '\u{0342}',),
-                    0xf7 => return Fold::Three('\u{03c9}', '\u{0342}', '\u{03b9}',),
-                    x @ _ if 0xf8 <= x && x <= 0xf9  => from.wrapping_sub(0x0080),
-                    x @ _ if 0xfa <= x && x <= 0xfb  => from.wrapping_sub(0x007e),
-                    0xfc => return Fold::Two('\u{03c9}', '\u{03b9}',),
-                    _ => from
-                }
-            }
-            0x20 => {
-                from
-            }
-            0x21 => {
-                match low_byte {
-                    0x26 => 0x03c9,
-                    0x2a => 0x006b,
-                    0x2b => 0x00e5,
-                    0x32 => 0x214e,
-                    x @ _ if 0x60 <= x && x <= 0x6f  => from.wrapping_add(0x0010),
-                    0x83 => 0x2184,
-                    _ => from
-                }
-            }
-            0x22 => {
-                from
-            }
-            0x23 => {
-                from
-            }
-            0x24 => {
-                match low_byte {
-                    x @ _ if 0xb6 <= x && x <= 0xcf  => from.wrapping_add(0x001a),
-                    _ => from
-                }
-            }
-            0x25 => {
-                from
-            }
-            0x26 => {
-                from
-            }
-            0x27 => {
-                from
-            }
-            0x28 => {
-                from
-            }
-            0x29 => {
-                from
-            }
-            0x2a => {
-                from
-            }
-            0x2b => {
-                from
-            }
-            0x2c => {
-                match low_byte {
-                    x @ _ if x <= 0x2e  => from.wrapping_add(0x0030),
-                    0x60 => 0x2c61,
-                    0x62 => 0x026b,
-                    0x63 => 0x1d7d,
-                    0x64 => 0x027d,
-                    x @ _ if 0x67 <= x && x <= 0x6b  => ((from+1) & !1),
-                    0x6d => 0x0251,
-                    0x6e => 0x0271,
-                    0x6f => 0x0250,
-                    0x70 => 0x0252,
-                    0x72 => 0x2c73,
-                    0x75 => 0x2c76,
-                    x @ _ if 0x7e <= x && x <= 0x7f  => from.wrapping_sub(0x2a3f),
-                    x @ _ if 0x80 <= x && x <= 0xe2  => (from | 1),
-                    x @ _ if 0xeb <= x && x <= 0xed  => ((from+1) & !1),
-                    0xf2 => 0x2cf3,
-                    _ => from
-                }
-            }
-            _ => from 
+                x @ _ if 0x68 <= x && x <= 0x6f => from.wrapping_sub(0x0008),
+                0x80 => return Fold::Two('\u{1f00}', '\u{03b9}'),
+                0x81 => return Fold::Two('\u{1f01}', '\u{03b9}'),
+                0x82 => return Fold::Two('\u{1f02}', '\u{03b9}'),
+                0x83 => return Fold::Two('\u{1f03}', '\u{03b9}'),
+                0x84 => return Fold::Two('\u{1f04}', '\u{03b9}'),
+                0x85 => return Fold::Two('\u{1f05}', '\u{03b9}'),
+                0x86 => return Fold::Two('\u{1f06}', '\u{03b9}'),
+                0x87 => return Fold::Two('\u{1f07}', '\u{03b9}'),
+                0x88 => return Fold::Two('\u{1f00}', '\u{03b9}'),
+                0x89 => return Fold::Two('\u{1f01}', '\u{03b9}'),
+                0x8a => return Fold::Two('\u{1f02}', '\u{03b9}'),
+                0x8b => return Fold::Two('\u{1f03}', '\u{03b9}'),
+                0x8c => return Fold::Two('\u{1f04}', '\u{03b9}'),
+                0x8d => return Fold::Two('\u{1f05}', '\u{03b9}'),
+                0x8e => return Fold::Two('\u{1f06}', '\u{03b9}'),
+                0x8f => return Fold::Two('\u{1f07}', '\u{03b9}'),
+                0x90 => return Fold::Two('\u{1f20}', '\u{03b9}'),
+                0x91 => return Fold::Two('\u{1f21}', '\u{03b9}'),
+                0x92 => return Fold::Two('\u{1f22}', '\u{03b9}'),
+                0x93 => return Fold::Two('\u{1f23}', '\u{03b9}'),
+                0x94 => return Fold::Two('\u{1f24}', '\u{03b9}'),
+                0x95 => return Fold::Two('\u{1f25}', '\u{03b9}'),
+                0x96 => return Fold::Two('\u{1f26}', '\u{03b9}'),
+                0x97 => return Fold::Two('\u{1f27}', '\u{03b9}'),
+                0x98 => return Fold::Two('\u{1f20}', '\u{03b9}'),
+                0x99 => return Fold::Two('\u{1f21}', '\u{03b9}'),
+                0x9a => return Fold::Two('\u{1f22}', '\u{03b9}'),
+                0x9b => return Fold::Two('\u{1f23}', '\u{03b9}'),
+                0x9c => return Fold::Two('\u{1f24}', '\u{03b9}'),
+                0x9d => return Fold::Two('\u{1f25}', '\u{03b9}'),
+                0x9e => return Fold::Two('\u{1f26}', '\u{03b9}'),
+                0x9f => return Fold::Two('\u{1f27}', '\u{03b9}'),
+                0xa0 => return Fold::Two('\u{1f60}', '\u{03b9}'),
+                0xa1 => return Fold::Two('\u{1f61}', '\u{03b9}'),
+                0xa2 => return Fold::Two('\u{1f62}', '\u{03b9}'),
+                0xa3 => return Fold::Two('\u{1f63}', '\u{03b9}'),
+                0xa4 => return Fold::Two('\u{1f64}', '\u{03b9}'),
+                0xa5 => return Fold::Two('\u{1f65}', '\u{03b9}'),
+                0xa6 => return Fold::Two('\u{1f66}', '\u{03b9}'),
+                0xa7 => return Fold::Two('\u{1f67}', '\u{03b9}'),
+                0xa8 => return Fold::Two('\u{1f60}', '\u{03b9}'),
+                0xa9 => return Fold::Two('\u{1f61}', '\u{03b9}'),
+                0xaa => return Fold::Two('\u{1f62}', '\u{03b9}'),
+                0xab => return Fold::Two('\u{1f63}', '\u{03b9}'),
+                0xac => return Fold::Two('\u{1f64}', '\u{03b9}'),
+                0xad => return Fold::Two('\u{1f65}', '\u{03b9}'),
+                0xae => return Fold::Two('\u{1f66}', '\u{03b9}'),
+                0xaf => return Fold::Two('\u{1f67}', '\u{03b9}'),
+                0xb2 => return Fold::Two('\u{1f70}', '\u{03b9}'),
+                0xb3 => return Fold::Two('\u{03b1}', '\u{03b9}'),
+                0xb4 => return Fold::Two('\u{03ac}', '\u{03b9}'),
+                0xb6 => return Fold::Two('\u{03b1}', '\u{0342}'),
+                0xb7 => return Fold::Three('\u{03b1}', '\u{0342}', '\u{03b9}'),
+                x @ _ if 0xb8 <= x && x <= 0xb9 => from.wrapping_sub(0x0008),
+                x @ _ if 0xba <= x && x <= 0xbb => from.wrapping_sub(0x004a),
+                0xbc => return Fold::Two('\u{03b1}', '\u{03b9}'),
+                0xbe => 0x03b9,
+                0xc2 => return Fold::Two('\u{1f74}', '\u{03b9}'),
+                0xc3 => return Fold::Two('\u{03b7}', '\u{03b9}'),
+                0xc4 => return Fold::Two('\u{03ae}', '\u{03b9}'),
+                0xc6 => return Fold::Two('\u{03b7}', '\u{0342}'),
+                0xc7 => return Fold::Three('\u{03b7}', '\u{0342}', '\u{03b9}'),
+                x @ _ if 0xc8 <= x && x <= 0xcb => from.wrapping_sub(0x0056),
+                0xcc => return Fold::Two('\u{03b7}', '\u{03b9}'),
+                0xd2 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0300}'),
+                0xd3 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0301}'),
+                0xd6 => return Fold::Two('\u{03b9}', '\u{0342}'),
+                0xd7 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0342}'),
+                x @ _ if 0xd8 <= x && x <= 0xd9 => from.wrapping_sub(0x0008),
+                x @ _ if 0xda <= x && x <= 0xdb => from.wrapping_sub(0x0064),
+                0xe2 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0300}'),
+                0xe3 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0301}'),
+                0xe4 => return Fold::Two('\u{03c1}', '\u{0313}'),
+                0xe6 => return Fold::Two('\u{03c5}', '\u{0342}'),
+                0xe7 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0342}'),
+                x @ _ if 0xe8 <= x && x <= 0xe9 => from.wrapping_sub(0x0008),
+                x @ _ if 0xea <= x && x <= 0xeb => from.wrapping_sub(0x0070),
+                0xec => 0x1fe5,
+                0xf2 => return Fold::Two('\u{1f7c}', '\u{03b9}'),
+                0xf3 => return Fold::Two('\u{03c9}', '\u{03b9}'),
+                0xf4 => return Fold::Two('\u{03ce}', '\u{03b9}'),
+                0xf6 => return Fold::Two('\u{03c9}', '\u{0342}'),
+                0xf7 => return Fold::Three('\u{03c9}', '\u{0342}', '\u{03b9}'),
+                x @ _ if 0xf8 <= x && x <= 0xf9 => from.wrapping_sub(0x0080),
+                x @ _ if 0xfa <= x && x <= 0xfb => from.wrapping_sub(0x007e),
+                0xfc => return Fold::Two('\u{03c9}', '\u{03b9}'),
+                _ => from,
+            },
+            0x20 => from,
+            0x21 => match low_byte {
+                0x26 => 0x03c9,
+                0x2a => 0x006b,
+                0x2b => 0x00e5,
+                0x32 => 0x214e,
+                x @ _ if 0x60 <= x && x <= 0x6f => from.wrapping_add(0x0010),
+                0x83 => 0x2184,
+                _ => from,
+            },
+            0x22 => from,
+            0x23 => from,
+            0x24 => match low_byte {
+                x @ _ if 0xb6 <= x && x <= 0xcf => from.wrapping_add(0x001a),
+                _ => from,
+            },
+            0x25 => from,
+            0x26 => from,
+            0x27 => from,
+            0x28 => from,
+            0x29 => from,
+            0x2a => from,
+            0x2b => from,
+            0x2c => match low_byte {
+                x @ _ if x <= 0x2e => from.wrapping_add(0x0030),
+                0x60 => 0x2c61,
+                0x62 => 0x026b,
+                0x63 => 0x1d7d,
+                0x64 => 0x027d,
+                x @ _ if 0x67 <= x && x <= 0x6b => ((from + 1) & !1),
+                0x6d => 0x0251,
+                0x6e => 0x0271,
+                0x6f => 0x0250,
+                0x70 => 0x0252,
+                0x72 => 0x2c73,
+                0x75 => 0x2c76,
+                x @ _ if 0x7e <= x && x <= 0x7f => from.wrapping_sub(0x2a3f),
+                x @ _ if 0x80 <= x && x <= 0xe2 => (from | 1),
+                x @ _ if 0xeb <= x && x <= 0xed => ((from + 1) & !1),
+                0xf2 => 0x2cf3,
+                _ => from,
+            },
+            _ => from,
         };
-        Fold::One( char::from_u32(single_char as u32).unwrap_or(orig) )
+        Fold::One(char::from_u32(single_char as u32).unwrap_or(orig))
     } else {
         let single_char: u32 = match from {
-            x @ _ if 0xa640 <= x && x <= 0xa66c  => (from | 1),
-            x @ _ if 0xa680 <= x && x <= 0xa69a  => (from | 1),
-            x @ _ if 0xa722 <= x && x <= 0xa72e  => (from | 1),
-            x @ _ if 0xa732 <= x && x <= 0xa76e  => (from | 1),
-            x @ _ if 0xa779 <= x && x <= 0xa77b  => ((from+1) & !1),
+            x @ _ if 0xa640 <= x && x <= 0xa66c => (from | 1),
+            x @ _ if 0xa680 <= x && x <= 0xa69a => (from | 1),
+            x @ _ if 0xa722 <= x && x <= 0xa72e => (from | 1),
+            x @ _ if 0xa732 <= x && x <= 0xa76e => (from | 1),
+            x @ _ if 0xa779 <= x && x <= 0xa77b => ((from + 1) & !1),
             0xa77d => 0x1d79,
-            x @ _ if 0xa77e <= x && x <= 0xa786  => (from | 1),
+            x @ _ if 0xa77e <= x && x <= 0xa786 => (from | 1),
             0xa78b => 0xa78c,
             0xa78d => 0x0265,
-            x @ _ if 0xa790 <= x && x <= 0xa792  => (from | 1),
-            x @ _ if 0xa796 <= x && x <= 0xa7a8  => (from | 1),
+            x @ _ if 0xa790 <= x && x <= 0xa792 => (from | 1),
+            x @ _ if 0xa796 <= x && x <= 0xa7a8 => (from | 1),
             0xa7aa => 0x0266,
             0xa7ab => 0x025c,
             0xa7ac => 0x0261,
@@ -456,34 +372,34 @@ pub fn lookup(orig: char) -> Fold {
             0xa7b1 => 0x0287,
             0xa7b2 => 0x029d,
             0xa7b3 => 0xab53,
-            x @ _ if 0xa7b4 <= x && x <= 0xa7be  => (from | 1),
+            x @ _ if 0xa7b4 <= x && x <= 0xa7be => (from | 1),
             0xa7c2 => 0xa7c3,
             0xa7c4 => 0xa794,
             0xa7c5 => 0x0282,
             0xa7c6 => 0x1d8e,
-            x @ _ if 0xab70 <= x && x <= 0xabbf  => from.wrapping_sub(0x97d0),
-            0xfb00 => return Fold::Two('\u{0066}', '\u{0066}',),
-            0xfb01 => return Fold::Two('\u{0066}', '\u{0069}',),
-            0xfb02 => return Fold::Two('\u{0066}', '\u{006c}',),
-            0xfb03 => return Fold::Three('\u{0066}', '\u{0066}', '\u{0069}',),
-            0xfb04 => return Fold::Three('\u{0066}', '\u{0066}', '\u{006c}',),
-            0xfb05 => return Fold::Two('\u{0073}', '\u{0074}',),
-            0xfb06 => return Fold::Two('\u{0073}', '\u{0074}',),
-            0xfb13 => return Fold::Two('\u{0574}', '\u{0576}',),
-            0xfb14 => return Fold::Two('\u{0574}', '\u{0565}',),
-            0xfb15 => return Fold::Two('\u{0574}', '\u{056b}',),
-            0xfb16 => return Fold::Two('\u{057e}', '\u{0576}',),
-            0xfb17 => return Fold::Two('\u{0574}', '\u{056d}',),
-            x @ _ if 0xff21 <= x && x <= 0xff3a  => from.wrapping_add(0x0020),
-            x @ _ if 0x10400 <= x && x <= 0x10427  => from.wrapping_add(0x0028),
-            x @ _ if 0x104b0 <= x && x <= 0x104d3  => from.wrapping_add(0x0028),
-            x @ _ if 0x10c80 <= x && x <= 0x10cb2  => from.wrapping_add(0x0040),
-            x @ _ if 0x118a0 <= x && x <= 0x118bf  => from.wrapping_add(0x0020),
-            x @ _ if 0x16e40 <= x && x <= 0x16e5f  => from.wrapping_add(0x0020),
-            x @ _ if 0x1e900 <= x && x <= 0x1e921  => from.wrapping_add(0x0022),
-            _ => from
+            x @ _ if 0xab70 <= x && x <= 0xabbf => from.wrapping_sub(0x97d0),
+            0xfb00 => return Fold::Two('\u{0066}', '\u{0066}'),
+            0xfb01 => return Fold::Two('\u{0066}', '\u{0069}'),
+            0xfb02 => return Fold::Two('\u{0066}', '\u{006c}'),
+            0xfb03 => return Fold::Three('\u{0066}', '\u{0066}', '\u{0069}'),
+            0xfb04 => return Fold::Three('\u{0066}', '\u{0066}', '\u{006c}'),
+            0xfb05 => return Fold::Two('\u{0073}', '\u{0074}'),
+            0xfb06 => return Fold::Two('\u{0073}', '\u{0074}'),
+            0xfb13 => return Fold::Two('\u{0574}', '\u{0576}'),
+            0xfb14 => return Fold::Two('\u{0574}', '\u{0565}'),
+            0xfb15 => return Fold::Two('\u{0574}', '\u{056b}'),
+            0xfb16 => return Fold::Two('\u{057e}', '\u{0576}'),
+            0xfb17 => return Fold::Two('\u{0574}', '\u{056d}'),
+            x @ _ if 0xff21 <= x && x <= 0xff3a => from.wrapping_add(0x0020),
+            x @ _ if 0x10400 <= x && x <= 0x10427 => from.wrapping_add(0x0028),
+            x @ _ if 0x104b0 <= x && x <= 0x104d3 => from.wrapping_add(0x0028),
+            x @ _ if 0x10c80 <= x && x <= 0x10cb2 => from.wrapping_add(0x0040),
+            x @ _ if 0x118a0 <= x && x <= 0x118bf => from.wrapping_add(0x0020),
+            x @ _ if 0x16e40 <= x && x <= 0x16e5f => from.wrapping_add(0x0020),
+            x @ _ if 0x1e900 <= x && x <= 0x1e921 => from.wrapping_add(0x0022),
+            _ => from,
         };
-        Fold::One( char::from_u32(single_char).unwrap_or(orig) )
+        Fold::One(char::from_u32(single_char).unwrap_or(orig))
     }
 }
 
@@ -548,7 +464,7 @@ fn lookup_consistency() {
             0x00dc => 0x00fc,
             0x00dd => 0x00fd,
             0x00de => 0x00fe,
-            0x00df => return Fold::Two('\u{0073}', '\u{0073}',),
+            0x00df => return Fold::Two('\u{0073}', '\u{0073}'),
             0x0100 => 0x0101,
             0x0102 => 0x0103,
             0x0104 => 0x0105,
@@ -573,7 +489,7 @@ fn lookup_consistency() {
             0x012a => 0x012b,
             0x012c => 0x012d,
             0x012e => 0x012f,
-            0x0130 => return Fold::Two('\u{0069}', '\u{0307}',),
+            0x0130 => return Fold::Two('\u{0069}', '\u{0307}'),
             0x0132 => 0x0133,
             0x0134 => 0x0135,
             0x0136 => 0x0137,
@@ -585,7 +501,7 @@ fn lookup_consistency() {
             0x0143 => 0x0144,
             0x0145 => 0x0146,
             0x0147 => 0x0148,
-            0x0149 => return Fold::Two('\u{02bc}', '\u{006e}',),
+            0x0149 => return Fold::Two('\u{02bc}', '\u{006e}'),
             0x014a => 0x014b,
             0x014c => 0x014d,
             0x014e => 0x014f,
@@ -673,7 +589,7 @@ fn lookup_consistency() {
             0x01ea => 0x01eb,
             0x01ec => 0x01ed,
             0x01ee => 0x01ef,
-            0x01f0 => return Fold::Two('\u{006a}', '\u{030c}',),
+            0x01f0 => return Fold::Two('\u{006a}', '\u{030c}'),
             0x01f1 => 0x01f3,
             0x01f2 => 0x01f3,
             0x01f4 => 0x01f5,
@@ -734,7 +650,7 @@ fn lookup_consistency() {
             0x038c => 0x03cc,
             0x038e => 0x03cd,
             0x038f => 0x03ce,
-            0x0390 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0301}',),
+            0x0390 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0301}'),
             0x0391 => 0x03b1,
             0x0392 => 0x03b2,
             0x0393 => 0x03b3,
@@ -761,7 +677,7 @@ fn lookup_consistency() {
             0x03a9 => 0x03c9,
             0x03aa => 0x03ca,
             0x03ab => 0x03cb,
-            0x03b0 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0301}',),
+            0x03b0 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0301}'),
             0x03c2 => 0x03c3,
             0x03cf => 0x03d7,
             0x03d0 => 0x03b2,
@@ -976,7 +892,7 @@ fn lookup_consistency() {
             0x0554 => 0x0584,
             0x0555 => 0x0585,
             0x0556 => 0x0586,
-            0x0587 => return Fold::Two('\u{0565}', '\u{0582}',),
+            0x0587 => return Fold::Two('\u{0565}', '\u{0582}'),
             0x10a0 => 0x2d00,
             0x10a1 => 0x2d01,
             0x10a2 => 0x2d02,
@@ -1153,13 +1069,13 @@ fn lookup_consistency() {
             0x1e90 => 0x1e91,
             0x1e92 => 0x1e93,
             0x1e94 => 0x1e95,
-            0x1e96 => return Fold::Two('\u{0068}', '\u{0331}',),
-            0x1e97 => return Fold::Two('\u{0074}', '\u{0308}',),
-            0x1e98 => return Fold::Two('\u{0077}', '\u{030a}',),
-            0x1e99 => return Fold::Two('\u{0079}', '\u{030a}',),
-            0x1e9a => return Fold::Two('\u{0061}', '\u{02be}',),
+            0x1e96 => return Fold::Two('\u{0068}', '\u{0331}'),
+            0x1e97 => return Fold::Two('\u{0074}', '\u{0308}'),
+            0x1e98 => return Fold::Two('\u{0077}', '\u{030a}'),
+            0x1e99 => return Fold::Two('\u{0079}', '\u{030a}'),
+            0x1e9a => return Fold::Two('\u{0061}', '\u{02be}'),
             0x1e9b => 0x1e61,
-            0x1e9e => return Fold::Two('\u{0073}', '\u{0073}',),
+            0x1e9e => return Fold::Two('\u{0073}', '\u{0073}'),
             0x1ea0 => 0x1ea1,
             0x1ea2 => 0x1ea3,
             0x1ea4 => 0x1ea5,
@@ -1244,10 +1160,10 @@ fn lookup_consistency() {
             0x1f4b => 0x1f43,
             0x1f4c => 0x1f44,
             0x1f4d => 0x1f45,
-            0x1f50 => return Fold::Two('\u{03c5}', '\u{0313}',),
-            0x1f52 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0300}',),
-            0x1f54 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0301}',),
-            0x1f56 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0342}',),
+            0x1f50 => return Fold::Two('\u{03c5}', '\u{0313}'),
+            0x1f52 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0300}'),
+            0x1f54 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0301}'),
+            0x1f56 => return Fold::Three('\u{03c5}', '\u{0313}', '\u{0342}'),
             0x1f59 => 0x1f51,
             0x1f5b => 0x1f53,
             0x1f5d => 0x1f55,
@@ -1260,103 +1176,103 @@ fn lookup_consistency() {
             0x1f6d => 0x1f65,
             0x1f6e => 0x1f66,
             0x1f6f => 0x1f67,
-            0x1f80 => return Fold::Two('\u{1f00}', '\u{03b9}',),
-            0x1f81 => return Fold::Two('\u{1f01}', '\u{03b9}',),
-            0x1f82 => return Fold::Two('\u{1f02}', '\u{03b9}',),
-            0x1f83 => return Fold::Two('\u{1f03}', '\u{03b9}',),
-            0x1f84 => return Fold::Two('\u{1f04}', '\u{03b9}',),
-            0x1f85 => return Fold::Two('\u{1f05}', '\u{03b9}',),
-            0x1f86 => return Fold::Two('\u{1f06}', '\u{03b9}',),
-            0x1f87 => return Fold::Two('\u{1f07}', '\u{03b9}',),
-            0x1f88 => return Fold::Two('\u{1f00}', '\u{03b9}',),
-            0x1f89 => return Fold::Two('\u{1f01}', '\u{03b9}',),
-            0x1f8a => return Fold::Two('\u{1f02}', '\u{03b9}',),
-            0x1f8b => return Fold::Two('\u{1f03}', '\u{03b9}',),
-            0x1f8c => return Fold::Two('\u{1f04}', '\u{03b9}',),
-            0x1f8d => return Fold::Two('\u{1f05}', '\u{03b9}',),
-            0x1f8e => return Fold::Two('\u{1f06}', '\u{03b9}',),
-            0x1f8f => return Fold::Two('\u{1f07}', '\u{03b9}',),
-            0x1f90 => return Fold::Two('\u{1f20}', '\u{03b9}',),
-            0x1f91 => return Fold::Two('\u{1f21}', '\u{03b9}',),
-            0x1f92 => return Fold::Two('\u{1f22}', '\u{03b9}',),
-            0x1f93 => return Fold::Two('\u{1f23}', '\u{03b9}',),
-            0x1f94 => return Fold::Two('\u{1f24}', '\u{03b9}',),
-            0x1f95 => return Fold::Two('\u{1f25}', '\u{03b9}',),
-            0x1f96 => return Fold::Two('\u{1f26}', '\u{03b9}',),
-            0x1f97 => return Fold::Two('\u{1f27}', '\u{03b9}',),
-            0x1f98 => return Fold::Two('\u{1f20}', '\u{03b9}',),
-            0x1f99 => return Fold::Two('\u{1f21}', '\u{03b9}',),
-            0x1f9a => return Fold::Two('\u{1f22}', '\u{03b9}',),
-            0x1f9b => return Fold::Two('\u{1f23}', '\u{03b9}',),
-            0x1f9c => return Fold::Two('\u{1f24}', '\u{03b9}',),
-            0x1f9d => return Fold::Two('\u{1f25}', '\u{03b9}',),
-            0x1f9e => return Fold::Two('\u{1f26}', '\u{03b9}',),
-            0x1f9f => return Fold::Two('\u{1f27}', '\u{03b9}',),
-            0x1fa0 => return Fold::Two('\u{1f60}', '\u{03b9}',),
-            0x1fa1 => return Fold::Two('\u{1f61}', '\u{03b9}',),
-            0x1fa2 => return Fold::Two('\u{1f62}', '\u{03b9}',),
-            0x1fa3 => return Fold::Two('\u{1f63}', '\u{03b9}',),
-            0x1fa4 => return Fold::Two('\u{1f64}', '\u{03b9}',),
-            0x1fa5 => return Fold::Two('\u{1f65}', '\u{03b9}',),
-            0x1fa6 => return Fold::Two('\u{1f66}', '\u{03b9}',),
-            0x1fa7 => return Fold::Two('\u{1f67}', '\u{03b9}',),
-            0x1fa8 => return Fold::Two('\u{1f60}', '\u{03b9}',),
-            0x1fa9 => return Fold::Two('\u{1f61}', '\u{03b9}',),
-            0x1faa => return Fold::Two('\u{1f62}', '\u{03b9}',),
-            0x1fab => return Fold::Two('\u{1f63}', '\u{03b9}',),
-            0x1fac => return Fold::Two('\u{1f64}', '\u{03b9}',),
-            0x1fad => return Fold::Two('\u{1f65}', '\u{03b9}',),
-            0x1fae => return Fold::Two('\u{1f66}', '\u{03b9}',),
-            0x1faf => return Fold::Two('\u{1f67}', '\u{03b9}',),
-            0x1fb2 => return Fold::Two('\u{1f70}', '\u{03b9}',),
-            0x1fb3 => return Fold::Two('\u{03b1}', '\u{03b9}',),
-            0x1fb4 => return Fold::Two('\u{03ac}', '\u{03b9}',),
-            0x1fb6 => return Fold::Two('\u{03b1}', '\u{0342}',),
-            0x1fb7 => return Fold::Three('\u{03b1}', '\u{0342}', '\u{03b9}',),
+            0x1f80 => return Fold::Two('\u{1f00}', '\u{03b9}'),
+            0x1f81 => return Fold::Two('\u{1f01}', '\u{03b9}'),
+            0x1f82 => return Fold::Two('\u{1f02}', '\u{03b9}'),
+            0x1f83 => return Fold::Two('\u{1f03}', '\u{03b9}'),
+            0x1f84 => return Fold::Two('\u{1f04}', '\u{03b9}'),
+            0x1f85 => return Fold::Two('\u{1f05}', '\u{03b9}'),
+            0x1f86 => return Fold::Two('\u{1f06}', '\u{03b9}'),
+            0x1f87 => return Fold::Two('\u{1f07}', '\u{03b9}'),
+            0x1f88 => return Fold::Two('\u{1f00}', '\u{03b9}'),
+            0x1f89 => return Fold::Two('\u{1f01}', '\u{03b9}'),
+            0x1f8a => return Fold::Two('\u{1f02}', '\u{03b9}'),
+            0x1f8b => return Fold::Two('\u{1f03}', '\u{03b9}'),
+            0x1f8c => return Fold::Two('\u{1f04}', '\u{03b9}'),
+            0x1f8d => return Fold::Two('\u{1f05}', '\u{03b9}'),
+            0x1f8e => return Fold::Two('\u{1f06}', '\u{03b9}'),
+            0x1f8f => return Fold::Two('\u{1f07}', '\u{03b9}'),
+            0x1f90 => return Fold::Two('\u{1f20}', '\u{03b9}'),
+            0x1f91 => return Fold::Two('\u{1f21}', '\u{03b9}'),
+            0x1f92 => return Fold::Two('\u{1f22}', '\u{03b9}'),
+            0x1f93 => return Fold::Two('\u{1f23}', '\u{03b9}'),
+            0x1f94 => return Fold::Two('\u{1f24}', '\u{03b9}'),
+            0x1f95 => return Fold::Two('\u{1f25}', '\u{03b9}'),
+            0x1f96 => return Fold::Two('\u{1f26}', '\u{03b9}'),
+            0x1f97 => return Fold::Two('\u{1f27}', '\u{03b9}'),
+            0x1f98 => return Fold::Two('\u{1f20}', '\u{03b9}'),
+            0x1f99 => return Fold::Two('\u{1f21}', '\u{03b9}'),
+            0x1f9a => return Fold::Two('\u{1f22}', '\u{03b9}'),
+            0x1f9b => return Fold::Two('\u{1f23}', '\u{03b9}'),
+            0x1f9c => return Fold::Two('\u{1f24}', '\u{03b9}'),
+            0x1f9d => return Fold::Two('\u{1f25}', '\u{03b9}'),
+            0x1f9e => return Fold::Two('\u{1f26}', '\u{03b9}'),
+            0x1f9f => return Fold::Two('\u{1f27}', '\u{03b9}'),
+            0x1fa0 => return Fold::Two('\u{1f60}', '\u{03b9}'),
+            0x1fa1 => return Fold::Two('\u{1f61}', '\u{03b9}'),
+            0x1fa2 => return Fold::Two('\u{1f62}', '\u{03b9}'),
+            0x1fa3 => return Fold::Two('\u{1f63}', '\u{03b9}'),
+            0x1fa4 => return Fold::Two('\u{1f64}', '\u{03b9}'),
+            0x1fa5 => return Fold::Two('\u{1f65}', '\u{03b9}'),
+            0x1fa6 => return Fold::Two('\u{1f66}', '\u{03b9}'),
+            0x1fa7 => return Fold::Two('\u{1f67}', '\u{03b9}'),
+            0x1fa8 => return Fold::Two('\u{1f60}', '\u{03b9}'),
+            0x1fa9 => return Fold::Two('\u{1f61}', '\u{03b9}'),
+            0x1faa => return Fold::Two('\u{1f62}', '\u{03b9}'),
+            0x1fab => return Fold::Two('\u{1f63}', '\u{03b9}'),
+            0x1fac => return Fold::Two('\u{1f64}', '\u{03b9}'),
+            0x1fad => return Fold::Two('\u{1f65}', '\u{03b9}'),
+            0x1fae => return Fold::Two('\u{1f66}', '\u{03b9}'),
+            0x1faf => return Fold::Two('\u{1f67}', '\u{03b9}'),
+            0x1fb2 => return Fold::Two('\u{1f70}', '\u{03b9}'),
+            0x1fb3 => return Fold::Two('\u{03b1}', '\u{03b9}'),
+            0x1fb4 => return Fold::Two('\u{03ac}', '\u{03b9}'),
+            0x1fb6 => return Fold::Two('\u{03b1}', '\u{0342}'),
+            0x1fb7 => return Fold::Three('\u{03b1}', '\u{0342}', '\u{03b9}'),
             0x1fb8 => 0x1fb0,
             0x1fb9 => 0x1fb1,
             0x1fba => 0x1f70,
             0x1fbb => 0x1f71,
-            0x1fbc => return Fold::Two('\u{03b1}', '\u{03b9}',),
+            0x1fbc => return Fold::Two('\u{03b1}', '\u{03b9}'),
             0x1fbe => 0x03b9,
-            0x1fc2 => return Fold::Two('\u{1f74}', '\u{03b9}',),
-            0x1fc3 => return Fold::Two('\u{03b7}', '\u{03b9}',),
-            0x1fc4 => return Fold::Two('\u{03ae}', '\u{03b9}',),
-            0x1fc6 => return Fold::Two('\u{03b7}', '\u{0342}',),
-            0x1fc7 => return Fold::Three('\u{03b7}', '\u{0342}', '\u{03b9}',),
+            0x1fc2 => return Fold::Two('\u{1f74}', '\u{03b9}'),
+            0x1fc3 => return Fold::Two('\u{03b7}', '\u{03b9}'),
+            0x1fc4 => return Fold::Two('\u{03ae}', '\u{03b9}'),
+            0x1fc6 => return Fold::Two('\u{03b7}', '\u{0342}'),
+            0x1fc7 => return Fold::Three('\u{03b7}', '\u{0342}', '\u{03b9}'),
             0x1fc8 => 0x1f72,
             0x1fc9 => 0x1f73,
             0x1fca => 0x1f74,
             0x1fcb => 0x1f75,
-            0x1fcc => return Fold::Two('\u{03b7}', '\u{03b9}',),
-            0x1fd2 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0300}',),
-            0x1fd3 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0301}',),
-            0x1fd6 => return Fold::Two('\u{03b9}', '\u{0342}',),
-            0x1fd7 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0342}',),
+            0x1fcc => return Fold::Two('\u{03b7}', '\u{03b9}'),
+            0x1fd2 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0300}'),
+            0x1fd3 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0301}'),
+            0x1fd6 => return Fold::Two('\u{03b9}', '\u{0342}'),
+            0x1fd7 => return Fold::Three('\u{03b9}', '\u{0308}', '\u{0342}'),
             0x1fd8 => 0x1fd0,
             0x1fd9 => 0x1fd1,
             0x1fda => 0x1f76,
             0x1fdb => 0x1f77,
-            0x1fe2 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0300}',),
-            0x1fe3 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0301}',),
-            0x1fe4 => return Fold::Two('\u{03c1}', '\u{0313}',),
-            0x1fe6 => return Fold::Two('\u{03c5}', '\u{0342}',),
-            0x1fe7 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0342}',),
+            0x1fe2 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0300}'),
+            0x1fe3 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0301}'),
+            0x1fe4 => return Fold::Two('\u{03c1}', '\u{0313}'),
+            0x1fe6 => return Fold::Two('\u{03c5}', '\u{0342}'),
+            0x1fe7 => return Fold::Three('\u{03c5}', '\u{0308}', '\u{0342}'),
             0x1fe8 => 0x1fe0,
             0x1fe9 => 0x1fe1,
             0x1fea => 0x1f7a,
             0x1feb => 0x1f7b,
             0x1fec => 0x1fe5,
-            0x1ff2 => return Fold::Two('\u{1f7c}', '\u{03b9}',),
-            0x1ff3 => return Fold::Two('\u{03c9}', '\u{03b9}',),
-            0x1ff4 => return Fold::Two('\u{03ce}', '\u{03b9}',),
-            0x1ff6 => return Fold::Two('\u{03c9}', '\u{0342}',),
-            0x1ff7 => return Fold::Three('\u{03c9}', '\u{0342}', '\u{03b9}',),
+            0x1ff2 => return Fold::Two('\u{1f7c}', '\u{03b9}'),
+            0x1ff3 => return Fold::Two('\u{03c9}', '\u{03b9}'),
+            0x1ff4 => return Fold::Two('\u{03ce}', '\u{03b9}'),
+            0x1ff6 => return Fold::Two('\u{03c9}', '\u{0342}'),
+            0x1ff7 => return Fold::Three('\u{03c9}', '\u{0342}', '\u{03b9}'),
             0x1ff8 => 0x1f78,
             0x1ff9 => 0x1f79,
             0x1ffa => 0x1f7c,
             0x1ffb => 0x1f7d,
-            0x1ffc => return Fold::Two('\u{03c9}', '\u{03b9}',),
+            0x1ffc => return Fold::Two('\u{03c9}', '\u{03b9}'),
             0x2126 => 0x03c9,
             0x212a => 0x006b,
             0x212b => 0x00e5,
@@ -1715,18 +1631,18 @@ fn lookup_consistency() {
             0xabbd => 0x13ed,
             0xabbe => 0x13ee,
             0xabbf => 0x13ef,
-            0xfb00 => return Fold::Two('\u{0066}', '\u{0066}',),
-            0xfb01 => return Fold::Two('\u{0066}', '\u{0069}',),
-            0xfb02 => return Fold::Two('\u{0066}', '\u{006c}',),
-            0xfb03 => return Fold::Three('\u{0066}', '\u{0066}', '\u{0069}',),
-            0xfb04 => return Fold::Three('\u{0066}', '\u{0066}', '\u{006c}',),
-            0xfb05 => return Fold::Two('\u{0073}', '\u{0074}',),
-            0xfb06 => return Fold::Two('\u{0073}', '\u{0074}',),
-            0xfb13 => return Fold::Two('\u{0574}', '\u{0576}',),
-            0xfb14 => return Fold::Two('\u{0574}', '\u{0565}',),
-            0xfb15 => return Fold::Two('\u{0574}', '\u{056b}',),
-            0xfb16 => return Fold::Two('\u{057e}', '\u{0576}',),
-            0xfb17 => return Fold::Two('\u{0574}', '\u{056d}',),
+            0xfb00 => return Fold::Two('\u{0066}', '\u{0066}'),
+            0xfb01 => return Fold::Two('\u{0066}', '\u{0069}'),
+            0xfb02 => return Fold::Two('\u{0066}', '\u{006c}'),
+            0xfb03 => return Fold::Three('\u{0066}', '\u{0066}', '\u{0069}'),
+            0xfb04 => return Fold::Three('\u{0066}', '\u{0066}', '\u{006c}'),
+            0xfb05 => return Fold::Two('\u{0073}', '\u{0074}'),
+            0xfb06 => return Fold::Two('\u{0073}', '\u{0074}'),
+            0xfb13 => return Fold::Two('\u{0574}', '\u{0576}'),
+            0xfb14 => return Fold::Two('\u{0574}', '\u{0565}'),
+            0xfb15 => return Fold::Two('\u{0574}', '\u{056b}'),
+            0xfb16 => return Fold::Two('\u{057e}', '\u{0576}'),
+            0xfb17 => return Fold::Two('\u{0574}', '\u{056d}'),
             0xff21 => 0xff41,
             0xff22 => 0xff42,
             0xff23 => 0xff43,
@@ -1978,17 +1894,21 @@ fn lookup_consistency() {
             0x1e91f => 0x1e941,
             0x1e920 => 0x1e942,
             0x1e921 => 0x1e943,
-            _ => orig as u32
+            _ => orig as u32,
         };
-        Fold::One( char::from_u32(single_char).unwrap() )
+        Fold::One(char::from_u32(single_char).unwrap())
     }
-    
+
     for c_index in 0..126217 {
         if let Some(c) = char::from_u32(c_index) {
             let reference: Vec<char> = lookup_naive(c).collect();
             let actual: Vec<char> = lookup(c).collect();
             if actual != reference {
-                assert!(false, "case-folding {:?} (#0x{:04x}) failed: Expected {:?}, got {:?}", c, c_index, reference, actual);
+                assert!(
+                    false,
+                    "case-folding {:?} (#0x{:04x}) failed: Expected {:?}, got {:?}",
+                    c, c_index, reference, actual
+                );
             }
         }
     }
