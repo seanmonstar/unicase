@@ -1,8 +1,9 @@
 # unicase
 
-[![Build Status](https://travis-ci.org/seanmonstar/unicase.svg?branch=master)](https://travis-ci.org/seanmonstar/unicase)
-
-[Documentation](https://docs.rs/unicase)
+[![crates.io](https://img.shields.io/crates/v/unicase.svg)](https://crates.io/crates/unicase)
+[![Released API docs](https://docs.rs/unicase/badge.svg)](https://docs.rs/unicase)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![CI](https://github.com/seanmonstar/unicase/workflows/CI/badge.svg)](https://github.com/seanmonstar/unicase/actions?query=workflow%3ACI)
 
 Compare strings when case is not important (using Unicode Case-folding).
 
