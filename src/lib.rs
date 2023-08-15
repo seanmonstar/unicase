@@ -138,6 +138,24 @@ impl<S: AsRef<str>> UniCase<S> {
             UniCase(Encoding::Unicode(Unicode(s)))
         }
     }
+
+    /// Returns a copy of this string where each character is mapped to its
+    /// Unicode CaseFolding equivalent.
+    ///
+    /// # Note
+    ///
+    /// Unicode Case Folding is meant for string storage and matching, not for
+    /// display.
+    pub fn to_folded_case(&self) -> String {
+        #[cfg(not(__unicase__core_and_alloc))]
+        #[allow(deprecated, unused)]
+        use std::ascii::AsciiExt;
+
+        match self.0 {
+            Encoding::Ascii(ref s) => s.0.as_ref().to_ascii_lowercase(),
+            Encoding::Unicode(ref s) => s.to_folded_case(),
+        }
+    }
 }
 
 impl<S> UniCase<S> {

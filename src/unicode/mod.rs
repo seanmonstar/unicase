@@ -1,3 +1,5 @@
+#[cfg(all(__unicase__core_and_alloc, not(test)))]
+use alloc::string::String;
 #[cfg(__unicase__iter_cmp)]
 use core::cmp::Ordering;
 use core::hash::{Hash, Hasher};
@@ -7,6 +9,12 @@ mod map;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Unicode<S>(pub S);
+
+impl<S: AsRef<str>> Unicode<S> {
+    pub fn to_folded_case(&self) -> String {
+        self.0.as_ref().chars().flat_map(lookup).collect()
+    }
+}
 
 impl<S1: AsRef<str>, S2: AsRef<str>> PartialEq<Unicode<S2>> for Unicode<S1> {
     #[inline]
@@ -182,6 +190,11 @@ mod tests {
         eq!("ﬂour", "flour");
         eq!("Maße", "MASSE");
         eq!("ᾲ στο διάολο", "ὰι στο διάολο");
+    }
+
+    #[test]
+    fn test_to_folded_case() {
+        assert_eq!(Unicode("Maße").to_folded_case(), "masse");
     }
 
     #[cfg(feature = "nightly")]
