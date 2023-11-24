@@ -68,6 +68,7 @@ use self::unicode::Unicode;
 
 mod ascii;
 mod unicode;
+pub mod noopt;
 
 /// Case Insensitive wrapper of strings.
 #[derive(Clone, Copy)]
