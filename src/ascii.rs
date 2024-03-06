@@ -1,39 +1,19 @@
 use alloc::string::String;
-#[cfg(__unicase__iter_cmp)]
 use core::cmp::Ordering;
 use core::fmt;
 use core::hash::{Hash, Hasher};
 use core::ops::{Deref, DerefMut};
 use core::str::FromStr;
-#[cfg(not(__unicase__core_and_alloc))]
-#[allow(deprecated, unused)]
-use std::ascii::AsciiExt;
 
 use super::{Ascii, Encoding, UniCase};
 
 impl<S> Ascii<S> {
     #[inline]
-    #[cfg(__unicase__const_fns)]
     pub const fn new(s: S) -> Ascii<S> {
         Ascii(s)
     }
 
-    /// Construct a new `Ascii`.
-    ///
-    /// For Rust versions >= 1.31, this is a `const fn`.
-    #[inline]
-    #[cfg(not(__unicase__const_fns))]
-    pub fn new(s: S) -> Ascii<S> {
-        Ascii(s)
-    }
-
-    #[cfg(__unicase_const_fns)]
     pub const fn into_unicase(self) -> UniCase<S> {
-        UniCase(Encoding::Ascii(self))
-    }
-
-    #[cfg(not(__unicase_const_fns))]
-    pub fn into_unicase(self) -> UniCase<S> {
         UniCase(Encoding::Ascii(self))
     }
 
@@ -58,7 +38,6 @@ impl<S> DerefMut for Ascii<S> {
     }
 }
 
-#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> PartialOrd for Ascii<T> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -66,7 +45,6 @@ impl<T: AsRef<str>> PartialOrd for Ascii<T> {
     }
 }
 
-#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> Ord for Ascii<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
@@ -131,10 +109,7 @@ impl<S: AsRef<str>> Hash for Ascii<S> {
 
 #[cfg(test)]
 mod tests {
-    #[cfg(__unicase__default_hasher)]
     use std::collections::hash_map::DefaultHasher;
-    #[cfg(not(__unicase__default_hasher))]
-    use std::hash::SipHasher as DefaultHasher;
     use std::hash::{Hash, Hasher};
     use Ascii;
 
@@ -165,7 +140,6 @@ mod tests {
         b.iter(|| assert_eq!(Ascii("foobar"), Ascii("FOOBAR")));
     }
 
-    #[cfg(__unicase__iter_cmp)]
     #[test]
     fn test_case_cmp() {
         assert!(Ascii("foobar") == Ascii("FOOBAR"));
@@ -178,7 +152,6 @@ mod tests {
         assert!(Ascii("a") < Ascii("AA"));
     }
 
-    #[cfg(__unicase__const_fns)]
     #[test]
     fn test_ascii_new_const() {
         const _ASCII: Ascii<&'static str> = Ascii::new("");
