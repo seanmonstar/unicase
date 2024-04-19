@@ -1,6 +1,5 @@
-#[cfg(all(__unicase__core_and_alloc, not(test)))]
+#[cfg(not(test))]
 use alloc::string::String;
-#[cfg(__unicase__iter_cmp)]
 use core::cmp::Ordering;
 use core::hash::{Hash, Hasher};
 
@@ -43,7 +42,6 @@ impl<S1: AsRef<str>, S2: AsRef<str>> PartialEq<Unicode<S2>> for Unicode<S1> {
 
 impl<S: AsRef<str>> Eq for Unicode<S> {}
 
-#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> PartialOrd for Unicode<T> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -51,7 +49,6 @@ impl<T: AsRef<str>> PartialOrd for Unicode<T> {
     }
 }
 
-#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> Ord for Unicode<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
