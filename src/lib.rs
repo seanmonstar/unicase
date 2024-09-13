@@ -130,6 +130,19 @@ where
     }
 }
 
+#[cfg(feature = "serde")]
+impl<S> serde::Serialize for UniCase<S>
+where
+    S: serde::Serialize,
+{
+    fn serialize<T>(&self, serializer: T) -> Result<T::Ok, T::Error>
+    where
+        T: serde::Serializer,
+    {
+        inner!(self.0).serialize(serializer)
+    }
+}
+
 impl<S: AsRef<str> + Default> Default for UniCase<S> {
     fn default() -> Self {
         Self::new(Default::default())
@@ -456,6 +469,18 @@ mod tests {
         assert_eq!(b, UniCase::new("foobar".to_string()));
         assert_eq!(b, a);
         assert_ne!(b, UniCase::new("baz"));
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_serialize() {
+        let a = UniCase::new("foobar");
+        let json = serde_json::to_string(&a).unwrap();
+        assert_eq!(json, "\"foobar\"");
+
+        let a = UniCase::new("FOOBAR");
+        let json = serde_json::to_string(&a).unwrap();
+        assert_eq!(json, "\"FOOBAR\"");
     }
 
     #[cfg(__unicase__iter_cmp)]

@@ -1,3 +1,4 @@
+use alloc::borrow::Cow;
 use alloc::string::String;
 #[cfg(__unicase__iter_cmp)]
 use core::cmp::Ordering;
@@ -53,6 +54,19 @@ where
         D: serde::Deserializer<'de>,
     {
         S::deserialize(deserializer).map(Ascii)
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<S> serde::Serialize for Ascii<S>
+where
+    S: serde::Serialize,
+{
+    fn serialize<T>(&self, serializer: T) -> Result<T::Ok, T::Error>
+    where
+        T: serde::Serializer,
+    {
+        self.0.serialize(serializer)
     }
 }
 
@@ -133,12 +147,43 @@ impl<S: FromStr> FromStr for Ascii<S> {
     }
 }
 
+macro_rules! from_impl {
+    ($from:ty => $to:ty; $by:ident) => (
+        impl<'a> From<$from> for Ascii<$to> {
+            fn from(s: $from) -> Self {
+                Ascii(s.$by())
+            }
+        }
+    );
+    ($from:ty => $to:ty) => ( from_impl!($from => $to; into); )
+}
+
 impl<S: AsRef<str>> From<S> for Ascii<S> {
     #[inline]
     fn from(s: S) -> Ascii<S> {
         Ascii(s)
     }
 }
+
+macro_rules! into_impl {
+    ($to:ty) => {
+        impl<'a> Into<$to> for Ascii<$to> {
+            fn into(self) -> $to {
+                self.0.into()
+            }
+        }
+    };
+}
+
+from_impl!(&'a str => Cow<'a, str>);
+from_impl!(String => Cow<'a, str>);
+from_impl!(&'a str => String);
+from_impl!(Cow<'a, str> => String; into_owned);
+from_impl!(&'a String => &'a str; as_ref);
+
+into_impl!(String);
+into_impl!(alloc::borrow::Cow<'a, str>);
+into_impl!(&'a str);
 
 impl<S: AsRef<str>> Hash for Ascii<S> {
     #[inline]
@@ -178,6 +223,25 @@ mod tests {
         assert_eq!(a, String::from("fooBar"));
     }
 
+    #[test]
+    fn test_into_impls() {
+        let a = Ascii("foobar");
+        let b: &str = a.into();
+        assert_eq!(b, "foobar");
+
+        let c = Ascii("FOOBAR".to_string());
+        let d: String = c.into();
+        assert_eq!(d, "FOOBAR");
+
+        let view: Ascii<&'static str> = Ascii("foobar");
+        let _: &'static str = view.into();
+        let _: &str = view.into();
+
+        let owned: Ascii<String> = "foobar".into();
+        let _: String = owned.clone().into();
+        let _: &str = owned.as_ref();
+    }
+
     #[cfg(feature = "nightly")]
     #[bench]
     fn bench_ascii_eq(b: &mut ::test::Bencher) {
@@ -212,6 +276,15 @@ mod tests {
         assert_eq!(map.get(&"abc".into()), Some(&3));
         assert_eq!(map.get(&"ABC".into()), Some(&3));
         assert_eq!(map.len(), 1);
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_ascii_serialize() {
+        let a = serde_json::to_string(&Ascii("foobar")).unwrap();
+        assert_eq!(a, "\"foobar\"");
+        let b = serde_json::to_string(&Ascii("FOOBAR")).unwrap();
+        assert_eq!(b, "\"FOOBAR\"");
     }
 
     #[cfg(__unicase__iter_cmp)]
