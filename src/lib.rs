@@ -117,6 +117,19 @@ macro_rules! inner {
     }};
 }
 
+#[cfg(feature = "serde")]
+impl<'de, S> serde::Deserialize<'de> for UniCase<S>
+where
+    S: serde::Deserialize<'de> + AsRef<str>,
+{
+    fn deserialize<D>(deserializer: D) -> Result<UniCase<S>, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        S::deserialize(deserializer).map(UniCase::new)
+    }
+}
+
 impl<S: AsRef<str> + Default> Default for UniCase<S> {
     fn default() -> Self {
         Self::new(Default::default())
@@ -430,6 +443,19 @@ mod tests {
     #[bench]
     fn bench_is_utf8(b: &mut ::test::Bencher) {
         b.iter(|| assert!(::std::str::from_utf8(SUBJECT).is_ok()));
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_deserialize() {
+        let a = serde_json::from_str::<UniCase<String>>("\"foobar\"").unwrap();
+        assert_eq!(a, UniCase::new("foobar"));
+        let b = serde_json::from_str::<UniCase<String>>("\"FOOBAR\"").unwrap();
+        assert_eq!(b, UniCase::new("FOOBAR"));
+        assert_eq!(b, UniCase::new("foobar"));
+        assert_eq!(b, UniCase::new("foobar".to_string()));
+        assert_eq!(b, a);
+        assert_ne!(b, UniCase::new("baz"));
     }
 
     #[cfg(__unicase__iter_cmp)]

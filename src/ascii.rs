@@ -43,6 +43,19 @@ impl<S> Ascii<S> {
     }
 }
 
+#[cfg(feature = "serde")]
+impl<'de, S> serde::Deserialize<'de> for Ascii<S>
+where
+    S: serde::Deserialize<'de>,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Ascii<S>, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        S::deserialize(deserializer).map(Ascii)
+    }
+}
+
 impl<S> Deref for Ascii<S> {
     type Target = S;
     #[inline]
@@ -163,6 +176,23 @@ mod tests {
     fn bench_ascii_eq(b: &mut ::test::Bencher) {
         b.bytes = b"foobar".len() as u64;
         b.iter(|| assert_eq!(Ascii("foobar"), Ascii("FOOBAR")));
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_ascii_deserialize() {
+        let a = serde_json::from_str::<Ascii<String>>("\"foobar\"").unwrap();
+        assert_eq!(a, Ascii("foobar"));
+        let b = serde_json::from_str::<Ascii<String>>("\"FOOBAR\"").unwrap();
+        assert_eq!(b, Ascii("FOOBAR"));
+        assert_eq!(b, Ascii("foobar"));
+        assert_eq!(b, a);
+        assert_ne!(b, Ascii("baz"));
+
+        let c = serde_json::from_str::<Ascii<&str>>("\"baz\"").unwrap();
+        assert_eq!(c, Ascii("baz"));
+        assert_eq!(c, Ascii("Baz"));
+        assert_eq!(c, Ascii("Baz".to_string()));
     }
 
     #[cfg(__unicase__iter_cmp)]
