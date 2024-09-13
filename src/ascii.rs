@@ -133,6 +133,13 @@ impl<S: FromStr> FromStr for Ascii<S> {
     }
 }
 
+impl<S: AsRef<str>> From<S> for Ascii<S> {
+    #[inline]
+    fn from(s: S) -> Ascii<S> {
+        Ascii(s)
+    }
+}
+
 impl<S: AsRef<str>> Hash for Ascii<S> {
     #[inline]
     fn hash<H: Hasher>(&self, hasher: &mut H) {
@@ -193,6 +200,18 @@ mod tests {
         assert_eq!(c, Ascii("baz"));
         assert_eq!(c, Ascii("Baz"));
         assert_eq!(c, Ascii("Baz".to_string()));
+
+        let mut map = std::collections::HashMap::<Ascii<&str>, i32>::new();
+        map.insert("abc".into(), 2);
+        assert_eq!(map.get(&"abc".into()), Some(&2));
+        assert_eq!(map.get(&"ABC".into()), Some(&2));
+        assert_eq!(map.len(), 1);
+        // test if the value is updated correctly using a different cased key
+        let old = map.insert("ABC".into(), 3);
+        assert_eq!(old, Some(2));
+        assert_eq!(map.get(&"abc".into()), Some(&3));
+        assert_eq!(map.get(&"ABC".into()), Some(&3));
+        assert_eq!(map.len(), 1);
     }
 
     #[cfg(__unicase__iter_cmp)]
