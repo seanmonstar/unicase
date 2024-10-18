@@ -187,6 +187,7 @@ test_max = singlet_runs[-1].end + 1000
 rs.write('\n');
 rs.write('#[test]\n');
 rs.write('fn lookup_consistency() {\n');
+rs.write('    use std::vec::Vec;\n');
 rs.write('    fn lookup_naive(orig: char) -> Fold {\n')
 rs.write('        let single_char = match orig as u32 {\n');
 for r in singlet_runs:
