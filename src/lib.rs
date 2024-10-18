@@ -1,8 +1,7 @@
 #![cfg_attr(test, deny(missing_docs))]
 #![cfg_attr(test, deny(warnings))]
-#![doc(html_root_url = "https://docs.rs/unicase/2.7.0")]
 #![cfg_attr(feature = "nightly", feature(test))]
-#![cfg_attr(all(__unicase__core_and_alloc, not(test),), no_std)]
+#![no_std]
 
 //! # UniCase
 //!
@@ -43,21 +42,15 @@
 //! assert_eq!(a, b);
 //! ```
 
+#[cfg(test)]
+extern crate std;
 #[cfg(feature = "nightly")]
 extern crate test;
 
-#[cfg(all(__unicase__core_and_alloc, not(test)))]
 extern crate alloc;
-#[cfg(all(__unicase__core_and_alloc, not(test)))]
 use alloc::string::String;
 
-#[cfg(not(all(__unicase__core_and_alloc, not(test))))]
-extern crate std as alloc;
-#[cfg(not(all(__unicase__core_and_alloc, not(test))))]
-extern crate std as core;
-
 use alloc::borrow::Cow;
-#[cfg(__unicase__iter_cmp)]
 use core::cmp::Ordering;
 use core::fmt;
 use core::hash::{Hash, Hasher};
@@ -128,10 +121,6 @@ impl<S: AsRef<str>> UniCase<S> {
     ///
     /// Note: This scans the text to determine if it is all ASCII or not.
     pub fn new(s: S) -> UniCase<S> {
-        #[cfg(not(__unicase__core_and_alloc))]
-        #[allow(deprecated, unused)]
-        use std::ascii::AsciiExt;
-
         if s.as_ref().is_ascii() {
             UniCase(Encoding::Ascii(Ascii(s)))
         } else {
@@ -147,10 +136,6 @@ impl<S: AsRef<str>> UniCase<S> {
     /// Unicode Case Folding is meant for string storage and matching, not for
     /// display.
     pub fn to_folded_case(&self) -> String {
-        #[cfg(not(__unicase__core_and_alloc))]
-        #[allow(deprecated, unused)]
-        use std::ascii::AsciiExt;
-
         match self.0 {
             Encoding::Ascii(ref s) => s.0.as_ref().to_ascii_lowercase(),
             Encoding::Unicode(ref s) => s.to_folded_case(),
@@ -160,30 +145,12 @@ impl<S: AsRef<str>> UniCase<S> {
 
 impl<S> UniCase<S> {
     /// Creates a new `UniCase`, skipping the ASCII check.
-    #[cfg(__unicase__const_fns)]
     pub const fn unicode(s: S) -> UniCase<S> {
         UniCase(Encoding::Unicode(Unicode(s)))
     }
 
-    /// Creates a new `UniCase`, skipping the ASCII check.
-    ///
-    /// For Rust versions >= 1.31, this is a `const fn`.
-    #[cfg(not(__unicase__const_fns))]
-    pub fn unicode(s: S) -> UniCase<S> {
-        UniCase(Encoding::Unicode(Unicode(s)))
-    }
-
     /// Creates a new `UniCase` which performs only ASCII case folding.
-    #[cfg(__unicase__const_fns)]
     pub const fn ascii(s: S) -> UniCase<S> {
-        UniCase(Encoding::Ascii(Ascii(s)))
-    }
-
-    /// Creates a new `UniCase` which performs only ASCII case folding.
-    ///
-    /// For Rust versions >= 1.31, this is a `const fn`.
-    #[cfg(not(__unicase__const_fns))]
-    pub fn ascii(s: S) -> UniCase<S> {
         UniCase(Encoding::Ascii(Ascii(s)))
     }
 
@@ -308,7 +275,6 @@ into_impl!(&'a str);
 into_impl!(String);
 into_impl!(Cow<'a, str>);
 
-#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> PartialOrd for UniCase<T> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -316,7 +282,6 @@ impl<T: AsRef<str>> PartialOrd for UniCase<T> {
     }
 }
 
-#[cfg(__unicase__iter_cmp)]
 impl<T: AsRef<str>> Ord for UniCase<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
@@ -343,11 +308,10 @@ impl<S: FromStr + AsRef<str>> FromStr for UniCase<S> {
 #[cfg(test)]
 mod tests {
     use super::UniCase;
-    #[cfg(__unicase__default_hasher)]
+    use std::borrow::ToOwned;
     use std::collections::hash_map::DefaultHasher;
-    #[cfg(not(__unicase__default_hasher))]
-    use std::hash::SipHasher as DefaultHasher;
     use std::hash::{Hash, Hasher};
+    use std::string::String;
 
     fn hash<T: Hash>(t: &T) -> u64 {
         let mut s = DefaultHasher::new();
@@ -432,7 +396,6 @@ mod tests {
         b.iter(|| assert!(::std::str::from_utf8(SUBJECT).is_ok()));
     }
 
-    #[cfg(__unicase__iter_cmp)]
     #[test]
     fn test_case_cmp() {
         assert!(UniCase::new("a") < UniCase::new("B"));
@@ -467,7 +430,6 @@ mod tests {
         let _: &str = owned.as_ref();
     }
 
-    #[cfg(__unicase__const_fns)]
     #[test]
     fn test_unicase_unicode_const() {
         const _UNICASE: UniCase<&'static str> = UniCase::unicode("");

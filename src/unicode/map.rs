@@ -412,6 +412,8 @@ pub fn lookup(orig: char) -> Fold {
 
 #[test]
 fn lookup_consistency() {
+    use std::vec::Vec;
+
     fn lookup_naive(orig: char) -> Fold {
         let single_char = match orig as u32 {
             0x0041 => 0x0061,
