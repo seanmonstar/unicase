@@ -63,7 +63,12 @@ impl<S: AsRef<str>> Hash for Unicode<S> {
         let mut buf = [0; 4];
         for c in self.0.as_ref().chars().flat_map(|c| lookup(c)) {
             let len = char_to_utf8(c, &mut buf);
-            hasher.write(&buf[..len])
+            // we can't use `write(buf)` because the ASCII variant uses
+            // `write_u8`. The docs for Hash say that's technically different.
+            // ¯\_(ツ)_/¯
+            for &b in &buf[..len] {
+                hasher.write_u8(b);
+            }
         }
     }
 }
