@@ -70,6 +70,8 @@ impl<S: AsRef<str>> Hash for Unicode<S> {
                 hasher.write_u8(b);
             }
         }
+        // prefix-freedom
+        hasher.write_u8(0xFF);
     }
 }
 
