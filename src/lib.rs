@@ -261,11 +261,7 @@ macro_rules! into_impl {
 
 impl<S: AsRef<str>> From<S> for UniCase<S> {
     fn from(s: S) -> Self {
-        if s.as_ref().is_ascii() {
-            UniCase::ascii(s)
-        } else {
-            UniCase::unicode(s)
-        }
+        UniCase::new(s)
     }
 }
 
