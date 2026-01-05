@@ -1,4 +1,6 @@
+#[cfg(feature = "alloc")]
 use alloc::string::String;
+
 use core::cmp::Ordering;
 use core::fmt;
 use core::hash::{Hash, Hasher};
@@ -73,6 +75,7 @@ impl<S: fmt::Display> fmt::Display for Ascii<S> {
     }
 }
 
+#[cfg(feature = "alloc")]
 impl<S1: AsRef<str>> PartialEq<Ascii<S1>> for String {
     #[inline]
     fn eq(&self, other: &Ascii<S1>) -> bool {

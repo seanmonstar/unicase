@@ -47,10 +47,15 @@ extern crate std;
 #[cfg(feature = "nightly")]
 extern crate test;
 
+#[cfg(feature = "alloc")]
 extern crate alloc;
+
+#[cfg(feature = "alloc")]
 use alloc::string::String;
 
+#[cfg(feature = "alloc")]
 use alloc::borrow::Cow;
+
 use core::cmp::Ordering;
 use core::fmt;
 use core::hash::{Hash, Hasher};
@@ -135,6 +140,7 @@ impl<S: AsRef<str>> UniCase<S> {
     ///
     /// Unicode Case Folding is meant for string storage and matching, not for
     /// display.
+    #[cfg(feature = "alloc")]
     pub fn to_folded_case(&self) -> String {
         match self.0 {
             Encoding::Ascii(ref s) => s.0.as_ref().to_ascii_lowercase(),
@@ -238,6 +244,7 @@ impl<S> From<Ascii<S>> for UniCase<S> {
     }
 }
 
+#[cfg(feature = "alloc")]
 macro_rules! from_impl {
     ($from:ty => $to:ty; $by:ident) => (
         impl<'a> From<$from> for UniCase<$to> {
@@ -265,14 +272,27 @@ impl<S: AsRef<str>> From<S> for UniCase<S> {
     }
 }
 
+#[cfg(feature = "alloc")]
 from_impl!(&'a str => Cow<'a, str>);
+
+#[cfg(feature = "alloc")]
 from_impl!(String => Cow<'a, str>);
+
+#[cfg(feature = "alloc")]
 from_impl!(&'a str => String);
+
+#[cfg(feature = "alloc")]
 from_impl!(Cow<'a, str> => String; into_owned);
+
+#[cfg(feature = "alloc")]
 from_impl!(&'a String => &'a str; as_ref);
 
 into_impl!(&'a str);
+
+#[cfg(feature = "alloc")]
 into_impl!(String);
+
+#[cfg(feature = "alloc")]
 into_impl!(Cow<'a, str>);
 
 impl<T: AsRef<str>> PartialOrd for UniCase<T> {
