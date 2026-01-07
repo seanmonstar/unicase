@@ -6,9 +6,13 @@ use self::map::lookup;
 mod map;
 
 #[derive(Clone, Copy, Debug, Default)]
-pub struct Unicode<S>(pub S);
+pub struct Unicode<S>(pub (super) S);
 
 impl<S: AsRef<str>> Unicode<S> {
+    pub fn new(s: S) -> Self {
+        Self(s)
+    }
+
     pub fn to_folded_case(&self) -> String {
         self.0.as_ref().chars().flat_map(lookup).collect()
     }
