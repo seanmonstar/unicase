@@ -1,4 +1,6 @@
+#[cfg(feature = "alloc")]
 use alloc::string::String;
+
 use core::cmp::Ordering;
 use core::hash::{Hash, Hasher};
 
@@ -9,6 +11,7 @@ mod map;
 pub struct Unicode<S>(pub S);
 
 impl<S: AsRef<str>> Unicode<S> {
+    #[cfg(feature = "alloc")]
     pub fn to_folded_case(&self) -> String {
         self.0.as_ref().chars().flat_map(lookup).collect()
     }
