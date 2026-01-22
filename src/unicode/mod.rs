@@ -39,6 +39,49 @@ impl<S1: AsRef<str>, S2: AsRef<str>> PartialEq<Unicode<S2>> for Unicode<S1> {
     }
 }
 
+impl<S1: AsRef<str>> Unicode<S1> {
+    /// Returns true if the given pattern matches a sub-slice of this string slice.
+    ///
+    /// Returns false if it does not.
+    #[inline]
+    pub fn contains<S2: AsRef<str>>(&self, pat: &Unicode<S2>) -> bool {
+        let mut left = self.0.as_ref().chars().flat_map(lookup);
+        let mut pat = pat.0.as_ref().chars().flat_map(lookup);
+
+        match pat.next() {
+            Some(p0) => 'out: loop {
+                match left.next() {
+                    Some(e) if e == p0 => {
+                        let mut left = left.clone();
+                        let mut pat = pat.clone();
+
+                        loop {
+                            let p = match pat.next() {
+                                None => break 'out true,
+                                Some(p) => p,
+                            };
+
+                            let e = match left.next() {
+                                None => break 'out false,
+                                Some(e) => e,
+                            };
+
+                            if e != p {
+                                break;
+                            }
+                        }
+                    }
+                    Some(_) => {
+                        continue;
+                    }
+                    None => break false,
+                }
+            },
+            None => true,
+        }
+    }
+}
+
 impl<S: AsRef<str>> Eq for Unicode<S> {}
 
 impl<T: AsRef<str>> PartialOrd for Unicode<T> {
@@ -212,5 +255,20 @@ mod tests {
     fn bench_simple_case_folding(b: &mut ::test::Bencher) {
         b.bytes = "στιγμας".len() as u64;
         b.iter(|| eq!("στιγμας", "στιγμασ"));
+    }
+
+    #[test]
+    fn test_contains() {
+        assert!(Unicode("A").contains(&Unicode("a")));
+        assert!(Unicode("AA").contains(&Unicode("a")));
+        assert!(Unicode("AAA").contains(&Unicode("aa")));
+        assert!(Unicode("BA").contains(&Unicode("a")));
+        assert!(Unicode("AB").contains(&Unicode("a")));
+        assert!(Unicode("BABABB").contains(&Unicode("babb")));
+
+        assert!(!Unicode("B").contains(&Unicode("a")));
+        assert!(!Unicode("BA").contains(&Unicode("aa")));
+        assert!(!Unicode("BA").contains(&Unicode("aa")));
+        assert!(!Unicode("BABABA").contains(&Unicode("babb")));
     }
 }

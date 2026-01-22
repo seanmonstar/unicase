@@ -172,6 +172,23 @@ impl<S> UniCase<S> {
     }
 }
 
+impl<S1: AsRef<str>> UniCase<S1> {
+    /// Returns true if the given pattern matches a sub-slice of this string slice.
+    ///
+    /// Returns false if it does not.
+    #[inline]
+    pub fn contains<S2: AsRef<str>>(&self, pat: &UniCase<S2>) -> bool {
+        match (&self.0, &pat.0) {
+            (&Encoding::Ascii(ref x), &Encoding::Ascii(ref p)) => x.as_ref().contains(p.as_ref()),
+            (&Encoding::Unicode(ref x), &Encoding::Unicode(ref p)) => x.contains(p),
+            (&Encoding::Ascii(ref x), &Encoding::Unicode(ref p)) => Unicode(x.as_ref()).contains(p),
+            (&Encoding::Unicode(ref x), &Encoding::Ascii(ref p)) => {
+                x.contains(&Unicode(p.as_ref()))
+            }
+        }
+    }
+}
+
 impl<S> Deref for UniCase<S> {
     type Target = S;
     #[inline]
