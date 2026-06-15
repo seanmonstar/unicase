@@ -6,6 +6,7 @@ use self::map::lookup;
 mod map;
 
 #[derive(Clone, Copy, Debug, Default)]
+#[repr(transparent)]
 pub struct Unicode<S>(pub S);
 
 impl<S: AsRef<str>> Unicode<S> {
