@@ -415,6 +415,7 @@ pub fn lookup(orig: char) -> Fold {
 }
 
 #[test]
+#[cfg(not(miri))]
 fn lookup_consistency() {
     use std::vec::Vec;
     fn lookup_naive(orig: char) -> Fold {
@@ -2023,3 +2024,6 @@ fn lookup_consistency() {
         }
     }
 }
+
+
+
