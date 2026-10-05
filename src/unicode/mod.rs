@@ -85,8 +85,8 @@ mod fold {
                     Some(one)
                 }
                 Fold::Three(one, two, three) => {
-                    *self = Fold::Two(one, two);
-                    Some(three)
+                    *self = Fold::Two(two, three);
+                    Some(one)
                 }
             }
         }
@@ -148,6 +148,16 @@ mod tests {
         eq!("ﬂour", "flour");
         eq!("Maße", "MASSE");
         eq!("ᾲ στο διάολο", "ὰι στο διάολο");
+    }
+
+    #[test]
+    fn test_three_char_case_folding() {
+        // Characters whose full case folding is three characters.
+        eq!("ﬃ", "ffi");
+        eq!("ﬄ", "FFL");
+        eq!("ΐ", "ι\u{308}\u{301}");
+        eq!("ᾷ", "α\u{342}ι");
+        assert_eq!(Unicode("ﬃ").to_folded_case(), "ffi");
     }
 
     #[test]
