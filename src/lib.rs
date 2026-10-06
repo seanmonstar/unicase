@@ -89,6 +89,25 @@ pub fn eq_ascii<S: AsRef<str> + ?Sized>(left: &S, right: &S) -> bool {
     Ascii(left) == Ascii(right)
 }
 
+/// Compare two string-like types for case-less ordering, using unicode folding.
+///
+/// Equivalent to `UniCase::new(left).cmp(&UniCase::new(right))`.
+///
+/// Note: This will perform a scan for ASCII characters before doing the
+/// the comparison. See `UniCase` for more information.
+#[inline]
+pub fn cmp<S: AsRef<str> + ?Sized>(left: &S, right: &S) -> Ordering {
+    UniCase::new(left).cmp(&UniCase::new(right))
+}
+
+/// Compare two string-like types for case-less ordering, ignoring ASCII case.
+///
+/// Equivalent to `Ascii(left).cmp(&Ascii(right))`.
+#[inline]
+pub fn cmp_ascii<S: AsRef<str> + ?Sized>(left: &S, right: &S) -> Ordering {
+    Ascii(left).cmp(&Ascii(right))
+}
+
 #[derive(Clone, Copy, Debug)]
 enum Encoding<S> {
     Ascii(Ascii<S>),
