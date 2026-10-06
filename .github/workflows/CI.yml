@@ -45,6 +45,7 @@ jobs:
         rust:
           - stable
           - beta
+          - nightly
 
         os:
           - ubuntu-latest
@@ -61,7 +62,12 @@ jobs:
           toolchain: ${{ matrix.rust }}
 
       - name: Test
+        if: ${{ matrix.rust != 'nightly' }}
         run: cargo test
+
+      - name: Test with "nightly-casefold" feature
+        if: ${{ matrix.rust == 'nightly' }}
+        run: cargo test --features nightly-casefold
 
   msrv:
     name: Check MSRV
@@ -80,4 +86,3 @@ jobs:
 
       - name: Check
         run: cargo build
-

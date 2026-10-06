@@ -1,6 +1,7 @@
 #![cfg_attr(test, deny(missing_docs))]
 #![cfg_attr(test, deny(warnings))]
 #![cfg_attr(feature = "nightly", feature(test))]
+#![cfg_attr(feature = "nightly-casefold", feature(casefold))]
 #![no_std]
 
 //! # UniCase

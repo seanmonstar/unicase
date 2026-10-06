@@ -2,8 +2,16 @@ use alloc::string::String;
 use core::cmp::Ordering;
 use core::hash::{Hash, Hasher};
 
-use self::map::lookup;
+#[cfg(not(feature = "nightly-casefold"))]
 mod map;
+
+#[cfg(not(feature = "nightly-casefold"))]
+use self::map::lookup;
+
+#[cfg(feature = "nightly-casefold")]
+fn lookup(orig: char) -> core::char::ToCasefold {
+    orig.to_casefold_unnormalized()
+}
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Unicode<S>(pub S);
@@ -59,8 +67,7 @@ impl<S: AsRef<str>> Hash for Unicode<S> {
     }
 }
 
-// internal mod so that the enum can be 'pub'
-// thanks privacy-checker :___(
+#[cfg(not(feature = "nightly-casefold"))]
 mod fold {
     #[derive(Clone, Copy)]
     pub enum Fold {
