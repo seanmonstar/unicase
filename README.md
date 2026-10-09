@@ -3,7 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/unicase.svg)](https://crates.io/crates/unicase)
 [![Released API docs](https://docs.rs/unicase/badge.svg)](https://docs.rs/unicase)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![CI](https://github.com/seanmonstar/unicase/workflows/CI/badge.svg)](https://github.com/seanmonstar/unicase/actions?query=workflow%3ACI)
+[![CI](https://github.com/seanmonstar/unicase/actions/workflows/CI.yml/badge.svg)](https://github.com/seanmonstar/unicase/actions?query=workflow%3ACI)
 
 Compare strings when case is not important (using Unicode Case-folding).
 
@@ -24,8 +24,8 @@ assert_eq!(c, d);
 
 Licensed under either of
 
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://apache.org/licenses/LICENSE-2.0)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or https://apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or https://opensource.org/license/mit)
 
 ### Contribution
 
